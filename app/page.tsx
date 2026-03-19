@@ -23,3 +23,6 @@ export default function Home() {
     </div>
   );
 }
+
+// this is the main landing page for the app, it will include sections such as hero, features, integrations, how it works, stats, more features, call to action and footer.
+// Each section will be a separate component that will be imported and used in this page.

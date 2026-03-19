@@ -123,3 +123,32 @@ model TranscriptChunk {
   createdAt   DateTime @default(now())
   meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }
+
+// This is the Prisma schema file that defines the data models and database structure for the application
+// It uses the Prisma schema language to define models, fields, relationships, and other database-related configurations
+// The generator block specifies the Prisma client generator and the output directory for the generated client code
+// The datasource block specifies the database provider and connection details
+// The model blocks define the data models for User, SlackInstallation, Meeting, UserIntegration, and TranscriptChunk, along with their fields, types, relationships, and constraints
+// You can customize this schema as needed for your application, such as adding additional models, fields, relationships, or other configurations
+// After defining the schema, you can use the Prisma CLI to generate the Prisma client and manage your database schema, such as creating migrations and applying them to your database
+// Make sure to keep your database connection details secure and do not commit sensitive information to version control.
+// Use environment variables or other secure methods to manage your database connection in development and production environments.
+// Note: The actual database connection URL should be provided in the environment variable DATABASE_URL, and the Prisma client will use that to connect to the database when running queries or performing operations.
+// To generate the Prisma client based on this schema, run the following command in your terminal:
+// npx prisma generate
+// This will create the Prisma client code in the specified output directory, which you can then import and use in your application to interact with the database using the defined models and relationships.
+// Note: Make sure to install the Prisma CLI and set up your database connection properly before running the generate command, as it relies on the configuration defined in the prisma.config.ts file to connect to the database and generate the client code based on the schema.
+// After generating the Prisma client, you can use it in your application code to perform database operations such as creating, reading, updating, and deleting records based on the defined models and relationships in this schema.
+// For example, you can import the Prisma client in your application code and use it to create a new user record like this:
+// import { PrismaClient } from '../lib/generated/prisma/client';
+// const prisma = new PrismaClient();
+// const newUser = await prisma.user.create({
+//   data: {
+//     clerkId: 'clerk_123',
+//     email: '
+//    name: 'John Doe',
+//   },
+// });
+// This will create a new user record in the database with the specified clerkId, email, and name fields, and the Prisma client will handle the database operations based on the defined schema and relationships
+// You can also perform more complex queries and operations using the Prisma client, such as querying related records, updating multiple records at once, or performing transactions, all based on the defined schema and relationships in this file.
+// Note: Make sure to keep your Prisma schema file organized and maintainable as your application grows, and consider using comments and documentation to explain the purpose and usage of each model, field, and relationship for better readability and maintainability of your codebase.

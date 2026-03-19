@@ -18,18 +18,18 @@ function CTASection() {
                     </span>
                 </h2>
                 <p className="text-lg bg-linear-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(156,163,175,0.3)] mb-8">
-                    Join thousands of teams aldready using MeetingBot to save time.
+                    Join thousands of teams already using 'Cognitic' to save time.
                 </p>
                 {isSignedIn ? (
                     <Button asChild size="lg" className='bg-blue-600 hover:bg-blue-700 px-8 py-4'>
-                        <Link href="/home" className='group'>
+                        <Link href="/dashboard" className='group'>
                             <span>Dashboard</span>
                             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </Button>
                 ) : (
                     <SignUpButton>
-                        <Button size="lg" className="bg-blue-600 hover:bg-blue-700 px-8 py-4 group">
+                        <Button size="lg" className="bg-blue-600 hover:bg-blue-700 px-8 py-4 group cursor-pointer">
                             <span>Start Your Free Trail</span>
                             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                         </Button>
@@ -42,7 +42,7 @@ function CTASection() {
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
                     <span className='ml-2 text-gray-500'>
-                        4.9/5 from 2+ reviews
+                        4.9/5 from 56+ reviews
                     </span>
                 </div>
             </div>

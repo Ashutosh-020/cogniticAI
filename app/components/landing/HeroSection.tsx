@@ -12,20 +12,20 @@ export default function HeroSection() {
     return (
         <>
             <nav className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-50">
-                <div className="max-w-6xl mx-auto px-4 py-4">
+                <div className="max-w-screen-2xl mx-auto px-4 py-4">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                                 <Bot className="w-5 h-5 text-white" />
 
                             </div>
-                            <span className="text-xl font-bold text-white">Meeting Bot</span>
+                            <span className="text-xl font-bold text-white">Cognitic</span>
 
                         </div>
                         <div className="flex items-center gap-4">
                             {isSignedIn ? (
                                 <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                                    <Link href="/home">Dashboard</Link>
+                                    <Link href="/dashboard">Dashboard</Link>
                                 </Button>
                             ) : (
                                 <>
@@ -52,7 +52,7 @@ export default function HeroSection() {
             </nav>
 
             <section className="py-20 px-4 bg-black">
-                <div className="max-w-4xl mx-auto text-center">
+                <div className="max-w-7xl mx-auto text-center">
                     <div className="group relative mx-auto flex w-fit items-center justify-center rounded-full px-4 py-1.5 shadow-[inset_0_-8px_10px_#3b82f61f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#3b82f63f] mb-8">
                         <span
                             className={cn(
@@ -76,18 +76,18 @@ export default function HeroSection() {
                             className="ml-1 w-4 h-4 stroke-neutral-500 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5"
                         />
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                        Transform Your Meetings with{' '}
-                        <span className="bg-linear-to-r from-blue-400 via-blue-500 to-blue-600  bg-clip-text text-transparent">AI Magic</span>
+                    <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+                            Transform Your Meetings with <br />
+                        <span className="bg-linear-to-r from-blue-400 via-blue-500 to-blue-600  bg-clip-text text-transparent">Cognitic</span>
                     </h1>
-                    <p className="text-lg max-w-2xl mx-auto mb-8 bg-linear-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(156,163,175,0.3)]">
-                        Automatic summaries, action items, and intelligent insights for every meeting.
+                    <p className="text-xl max-w-3xl mx-auto mb-8 bg-linear-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(156,163,175,0.3)]">
+                        Say goodbye to manual note-taking and hello to effortless meeting summaries, action items, and insights with Cognitic's AI-powered assistant.<br/>
                         Never miss important details again.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                         {isSignedIn ? (
                             <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 px-8 py-4" >
-                                <Link href="/home" className="group">
+                                <Link href="/dashboard" className="group">
                                     <span>Dashboard</span>
                                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
 
@@ -107,7 +107,7 @@ export default function HeroSection() {
                             <span>Watch Demo</span>
                         </Button>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-500">
+                    <div className="flex flex-row flex-wrap items-center justify-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center space-x-2">
                             <CheckCircle className="w-4 h-4 text-green-400" />
                             <span>No credit card required</span>
