@@ -2,7 +2,15 @@ import React from 'react'
 import { CalendarEvent } from '../hooks/useMeetings'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { Clock } from 'lucide-react'
+import { 
+    Clock, 
+    Calendar, 
+    Users, 
+    Video, 
+    AlertCircle, 
+    RefreshCw, 
+    CalendarPlus 
+} from 'lucide-react'
 import { format } from 'date-fns'
 
 interface UpcomingMeetingsProps {
@@ -29,90 +37,146 @@ function UpcomingMeetings({
     onConnectCalendar
 }: UpcomingMeetingsProps) {
     return (
-        <div>
-            <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-bold text-foreground'>Upcoming</h2>
-                <span className='text-sm text-muted-foreground'>({upcomingEvents.length})</span>
+        <div className="flex flex-col h-full">
+            {/* HEADER */}
+            <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-semibold tracking-tight text-foreground">
+                        Upcoming Meetings
+                    </h2>
+                    {upcomingEvents.length > 0 && (
+                        <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                            {upcomingEvents.length}
+                        </span>
+                    )}
+                </div>
+
+                {connected && !initialLoading && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onRefresh}
+                        disabled={loading}
+                        className="size-8 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+                        title="Refresh meetings"
+                    >
+                        <RefreshCw className={`size-4 ${loading ? 'animate-spin text-primary' : ''}`} />
+                    </Button>
+                )}
             </div>
 
+            {/* ERROR STATE */}
             {error && (
-                <div className='bg-destructive/15 border border-destructive/20 text-destructive px-4 py-3 rounded-2xl mb-6 text-sm'>
-                    {error}
+                <div className="mb-6 flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+                    <AlertCircle className="size-5 shrink-0 mt-0.5" />
+                    <p className="leading-relaxed">{error}</p>
                 </div>
             )}
 
+            {/* SKELETON LOADER */}
             {initialLoading ? (
-                <div className='bg-card rounded-lg p-6 border border-border'>
-                    <div className='animate-pulse'>
-                        <div className='w-12 h-12 mx-auto bg-muted rounded-full mb-3'></div>
-                        <div className='h-4 bg-muted rounded w-3/4 mx-auto mb-2'></div>
-                        <div className='h-3 bg-muted rounded w-1/2 mx-auto mb-4'></div>
-                        <div className='h-8 bg-muted rounded w-full'></div>
-                    </div>
+                <div className="flex flex-col gap-3">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border border-border/50 bg-card/50 p-4">
+                            <div className="mb-3 flex justify-between gap-4">
+                                <div className="h-4 w-3/4 animate-pulse rounded bg-muted"></div>
+                                <div className="h-5 w-8 animate-pulse rounded-full bg-muted"></div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-3 w-1/2 animate-pulse rounded bg-muted"></div>
+                                <div className="h-3 w-1/3 animate-pulse rounded bg-muted"></div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : !connected ? (
-                <div className='bg-card rounded-lg p-6 text-center border border-border'>
-                    <div className='w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-3'>
-                        📆
+                /* NOT CONNECTED STATE */
+                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/30 p-8 text-center">
+                    <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/20">
+                        <CalendarPlus className="size-6" />
                     </div>
-                    <h3 className='font-semibold mb-2 text-foreground text-sm'>Connect Calendar</h3>
-                    <p className='text-muted-foreground mb-4 text-xs'>
-                        Connect Google Calendar to see upcoming meetings
+                    <h3 className="mb-1 text-sm font-semibold text-foreground">
+                        Connect Your Calendar
+                    </h3>
+                    <p className="mb-6 max-w-50 text-xs text-muted-foreground">
+                        Sync your Google Calendar to view and manage upcoming meetings.
                     </p>
-
                     <Button
                         onClick={onConnectCalendar}
                         disabled={loading}
-                        className='w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors text-sm cursor-pointer'
+                        className="w-full cursor-pointer rounded-lg bg-primary text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]"
                     >
-                        {loading ? 'Connecting' : 'Connect Google Calendar'}
+                        {loading ? 'Connecting...' : 'Connect Calendar'}
                     </Button>
                 </div>
             ) : upcomingEvents.length === 0 ? (
-                <div className='bg-card rounded-lg p-6 text-center border border-border'>
-                    <h3 className='font-medium mb-2 text-foreground text-sm'>
+                /* EMPTY STATE */
+                <div className="flex flex-col items-center justify-center rounded-xl border border-border/50 bg-card/30 p-8 text-center">
+                    <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                        <Calendar className="size-5" />
+                    </div>
+                    <h3 className="text-sm font-medium text-foreground">
                         No upcoming meetings
                     </h3>
-                    <p className='text-muted-foreground text-xs '>
-                        Your calendar is clear!
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Your schedule is completely clear!
                     </p>
                 </div>
             ) : (
-                <div className='space-y-3'>
-                    <Button
-                        className='w-full px-3 py-2 bg-muted rounded-lg hover:bg-muted/80 disabled:opacity-50 transition-colors text-foreground text-sm mb-4 cursor-pointer'
-                        onClick={onRefresh}
-                        disabled={loading}
-                    >
-                        {loading ? 'Loading...' : 'Refresh'}
-                    </Button>
+                /* POPULATED STATE (EVENTS GRID/LIST) */
+                <div className="flex flex-col gap-3">
                     {upcomingEvents.map((event) => (
-                        <div key={event.id} className='bg-card rounded-lg p-3 border border-border hover:shadow-md transition-shadow relative'>
-                            <div className='absolute top-3 right-3'>
-                                <Switch
-                                    checked={!!botToggles[event.id]}
-                                    onCheckedChange={() => onToggleBot(event.id)}
-                                    aria-label='Toggle bot for this meeting'
-                                    className='cursor-pointer'
-                                />
-                            </div>
-                            <h4 className='font-medium text-sm text-foreground mb-2 pr-12'>{event.summary || 'No Title'}</h4>
-                            <div className='space-y-1 text-xs text-muted-foreground'>
-                                <div className='flex items-center gap-1'>
-                                    <Clock className='w-3 h-3' />
-                                    {format(new Date(event.start?.dateTime || event.start?.date || ''), 'MMM d, h:mm a')}
+                        <div 
+                            key={event.id} 
+                            className="group relative flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-primary/30 hover:shadow-md"
+                        >
+                            {/* Card Header: Title & Bot Toggle */}
+                            <div className="flex items-start justify-between gap-4">
+                                <h4 className="line-clamp-2 text-sm font-semibold text-foreground leading-snug">
+                                    {event.summary || 'Untitled Event'}
+                                </h4>
+                                <div className="flex shrink-0 items-center gap-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground/70">
+                                        Bot
+                                    </span>
+                                    <Switch
+                                        checked={!!botToggles[event.id]}
+                                        onCheckedChange={() => onToggleBot(event.id)}
+                                        aria-label="Toggle bot for this meeting"
+                                        className="cursor-pointer data-[state=checked]:bg-primary"
+                                    />
                                 </div>
-                                {event.attendees && (
-                                    <div>👥 {event.attendees.length} attendees</div>
+                            </div>
+
+                            {/* Card Body: Meta Info */}
+                            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                    <Clock className="size-3.5 text-foreground/50" />
+                                    <span>
+                                        {format(new Date(event.start?.dateTime || event.start?.date || ''), 'MMM d, h:mm a')}
+                                    </span>
+                                </div>
+                                {event.attendees && event.attendees.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <Users className="size-3.5 text-foreground/50" />
+                                        <span>{event.attendees.length} attendees</span>
+                                    </div>
                                 )}
                             </div>
+
+                            {/* Card Footer: Action */}
                             {(event.hangoutLink || event.location) && (
                                 <a
                                     href={event.hangoutLink || event.location || '#'}
-                                    target='_blank'
-                                    rel='noopener noreferrer'
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-1"
                                 >
-                                    <Button className='mt-2 w-full px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition-colors h-6 cursor-pointer'>
+                                    <Button 
+                                        variant="secondary" 
+                                        className="h-8 w-full cursor-pointer gap-2 rounded-lg bg-secondary/60 text-xs font-medium text-secondary-foreground hover:bg-secondary transition-colors"
+                                    >
+                                        <Video className="size-3.5" />
                                         Join Meeting
                                     </Button>
                                 </a>

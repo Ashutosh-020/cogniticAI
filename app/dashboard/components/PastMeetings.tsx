@@ -21,106 +21,127 @@ function PastMeetings({
     getInitials
 }: PastMeetingsProps) {
 
+    // Loading State
     if (pastLoading) {
         return (
-            <div className='space-y-4'>
-                {[1, 2, 3].map((i) => (
-                    <div key={i} className='bg-card rounded-lg p-4 border border-border animate-pulse'>
-                        <div className='flex justify-between items-start mb-3'>
-                            <div className='flex items-center gap-3 flex-1'>
-                                <div className='h-6 bg-muted rounded w-48'></div>
-                                <div className='flex -space-x-2'>
-
-                                    {[1, 2, 3].map((j) => (
-                                        <div key={j} className='w-6 h-6 rounded-full bg-muted'></div>
+            <div className="flex flex-col gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="rounded-2xl border border-border/50 bg-card/50 p-5">
+                        <div className="mb-4 flex items-start justify-between gap-4">
+                            <div className="flex flex-1 items-center gap-4">
+                                <div className="h-6 w-1/3 animate-pulse rounded-md bg-muted"></div>
+                                <div className="flex -space-x-2">
+                                    {Array.from({ length: 5 }).map((_, j) => (
+                                        <div key={j} className="size-7 animate-pulse rounded-full bg-muted"></div>
                                     ))}
                                 </div>
-
                             </div>
-                            <div className='h-5 bg-muted rounded w-20'></div>
+                            <div className="h-6 w-20 animate-pulse rounded-full bg-muted"></div>
                         </div>
-
-                        <div className='h-4 bg-muted rounded w-3/4 mb-3'></div>
-                        <div className='h-4 bg-muted rounded w-1/2 mb-3'></div>
-                        <div className='h-6 bg-muted rounded w-24'></div>
-
+                        <div className="mb-2 h-4 w-3/4 animate-pulse rounded bg-muted/70"></div>
+                        <div className="mb-5 h-4 w-1/2 animate-pulse rounded bg-muted/70"></div>
+                        <div className="h-8 w-28 animate-pulse rounded-lg bg-muted"></div>
                     </div>
                 ))}
-
             </div>
         )
     }
 
+    // Empty State
     if (pastMeetings.length === 0) {
         return (
-            <div className='bg-card rounded-lg p-8 text-center border border-border'>
-                <Video className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
-                <h3 className='text-lg font-medium mb-2 text-foreground'>No past meetings</h3>
-                <p className='text-muted-foreground'>Your completed meetings will appear here</p>
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
+                <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-muted/50 text-muted-foreground">
+                    <Video className="size-6" />
+                </div>
+                <h3 className="mb-1 text-base font-semibold text-foreground">
+                    No past meetings
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                    Your completed meetings and their insights will appear here.
+                </p>
             </div>
         )
     }
 
+    // Meeting Cards
     return (
-        <div className='space-y-4'>
+        <div className="flex flex-col gap-4">
             {pastMeetings.map((meeting) => (
                 <div
                     key={meeting.id}
-                    className='bg-card rounded-lg p-4 border border-border hover:shadow-md transition-shadow cursor-pointer'
+                    className="
+                        relative
+                        flex cursor-pointer flex-col
+                        rounded-2xl border border-border/60 bg-card p-5
+                        transition-colors duration-200
+                        hover:border-primary/40 hover:bg-accent/30
+                        overflow-visible
+                    "
                     onClick={() => onMeetingClick(meeting.id)}
                 >
-                    <div className='flex justify-between items-start mb-3'>
-                        <div className='flex items-center gap-3 flex-1'>
-                            <h3 className='font-semibold text-lg text-foreground'>
+
+                    {/* Header */}
+                    <div className="mb-3 flex items-start justify-between gap-4">
+                        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                            <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
                                 {meeting.title}
                             </h3>
+
                             {meeting.attendees && (
-                                <AttendeeAvatars
-                                    attendees={meeting.attendees}
-                                    getAttendeeList={getAttendeeList}
-                                    getInitials={getInitials}
-                                />
+                                <div
+                                    className="shrink-0"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <AttendeeAvatars
+                                        attendees={meeting.attendees}
+                                        getAttendeeList={getAttendeeList}
+                                        getInitials={getInitials}
+                                    />
+                                </div>
                             )}
                         </div>
-                        <span className='text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full'>
+
+                        <span className="inline-flex shrink-0 items-center rounded-full border border-green-500/20 bg-green-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-green-500">
                             Completed
                         </span>
                     </div>
+
+                    {/* Description */}
                     {meeting.description && (
-                        <p className='text-sm text-muted-foreground mb-3'>{meeting.description}</p>
+                        <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                            {meeting.description}
+                        </p>
                     )}
 
-                    <div className='text-sm text-muted-foreground mb-3'>
-                        <div className='flex items-center gap-2'>
-                            <Clock className='h-4 w-4' />
+                    {/* Footer */}
+                    <div className="mt-auto flex flex-col items-start justify-between gap-4 border-t border-border/40 pt-4 sm:flex-row sm:items-center">
+                        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                            <Clock className="size-4 text-foreground/40" />
                             <span>
-                                {format(new Date(meeting.startTime), 'PPp')} - {format(new Date(meeting.endTime), 'pp')}
+                                {format(new Date(meeting.startTime), 'MMM d, yyyy • h:mm a')} - {format(new Date(meeting.endTime), 'h:mm a')}
                             </span>
                         </div>
+
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <Button
+                                variant="secondary"
+                                className="h-8 cursor-pointer gap-2 rounded-lg bg-secondary/60 px-4 text-xs font-medium text-secondary-foreground hover:bg-secondary hover:text-foreground"
+                                onClick={() => onMeetingClick(meeting.id)}
+                            >
+                                View Details
+                                <ExternalLink className="size-3.5" />
+                            </Button>
+                        </div>
                     </div>
-
-                    <div
-                        className='flex gap-2 mt-4'
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <Button
-                            className='flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition-colors h-6 cursor-pointer'
-                            onClick={() => onMeetingClick(meeting.id)}
-                        >
-                            <ExternalLink className='h-3 w-3' />
-                            View Details
-                        </Button>
-
-                    </div>
-
                 </div>
             ))}
-
         </div>
     )
 }
 
 export default PastMeetings
+
 
 // This component displays a list of past meetings with their details. It handles loading states and empty states gracefully, providing a good user experience.
 // Each meeting item is clickable, allowing users to view more details about the meeting.

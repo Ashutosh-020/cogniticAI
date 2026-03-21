@@ -2,6 +2,7 @@ import * as path from "path";
 import * as fs from 'fs'
 import { prisma } from "@/lib/db";
 import { randomUUID } from "crypto";
+import 'dotenv/config'
 
 async function seedMeetings() {
     try {
@@ -48,7 +49,7 @@ async function seedMeetings() {
                     userId: userId,
                     title: meeting.title,
                     description: meeting.description,
-                    meetingUrl: 'https://meet.google.com/cug-hszq-vqv',
+                    meetingUrl: 'https://meet.google.com/jmz-ojtp-rty',
                     startTime: startTime,
                     endTime: endTime,
 

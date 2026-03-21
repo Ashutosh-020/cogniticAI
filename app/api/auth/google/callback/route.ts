@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db"
 import { NextResponse } from "next/server"
+import 'dotenv/config'
 
 export async function GET(request: Request) {
     try {

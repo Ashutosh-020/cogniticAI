@@ -1,4 +1,11 @@
-import { Bot, Home, IndianRupee, Layers3, Settings } from "lucide-react";
+import {
+  Home,
+  IndianRupee,
+  Layers3,
+  Settings,
+  Sparkles,
+  Bot,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useUsage } from "../contexts/UsageContext";
 import {
@@ -16,31 +23,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const items = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Integrations",
-    url: "/integrations",
-    icon: Layers3,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-  {
-    title: "Chat with AI",
-    url: "/chat",
-    icon: Bot,
-  },
-  {
-    title: "Pricing",
-    url: "/pricing",
-    icon: IndianRupee,
-  },
+  { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Integrations", url: "/integrations", icon: Layers3 },
+  { title: "Chat with AI", url: "/chat", icon: Bot },
+  { title: "Pricing", url: "/pricing", icon: IndianRupee },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -73,7 +60,6 @@ export function AppSidebar() {
           description: "Get 30 meetings per month and 100 daily chat messages",
           showButton: true,
         };
-
       case "platinum":
         return {
           title: "Upgrade to Diamond",
@@ -86,7 +72,6 @@ export function AppSidebar() {
           description: "Enjoying unlimited access to all features",
           showButton: false,
         };
-
       default:
         return {
           title: "Upgrade Your Plan",
@@ -101,33 +86,45 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="none"
-      className="border-r border-sidebar-border h-screen"
+      className="h-screen border-r border-sidebar-border transition-all duration-300 ease-in-out"
     >
-      <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-            <Bot className="w-4 h-4" />
+      {/* 1. PREMIUM HEADER */}
+      <SidebarHeader className="border-b border-sidebar-border/60 bg-sidebar/50 p-4 backdrop-blur-xl">
+        <div className="flex items-center gap-3 overflow-hidden">
+          {/* Premium Icon Container */}
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-purple-500/20">
+            <Sparkles className="h-5 w-5 text-white" strokeWidth={2} />
           </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">
-            Cognitic
-          </span>
+
+          {/* Stacked Typography */}
+          <div className="flex flex-col justify-center">
+            <span className="bg-linear-to-br from-sidebar-foreground to-sidebar-foreground/60 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+              Cognitic
+            </span>
+            <span className="mt-0.5 text-[10px] font-semibold uppercase leading-none tracking-widest text-sidebar-foreground/50">
+              Workspace
+            </span>
+          </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="flex-1 p-4">
+      {/* 2. PREMIUM NAVIGATION LINKS */}
+      <SidebarContent className="flex-1 px-3 py-4">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">
+            <SidebarMenu className="space-y-1.5">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.url}
-                    className="w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground"
+                    className="group relative flex w-full items-center justify-start gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all duration-300 hover:bg-white/5 hover:text-white data-[active=true]:bg-linear-to-r data-[active=true]:from-indigo-500/15 data-[active=true]:to-purple-500/5 data-[active=true]:text-indigo-300 data-[active=true]:shadow-[inset_3px_0_0_0_rgba(99,102,241,1)]"
                   >
                     <Link href={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
+                      <item.icon className="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:scale-110 group-data-[active=true]:text-indigo-400" />
+                      <span>
+                        {item.title}
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -137,91 +134,86 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 mt-auto">
+      {/* 3. RICH TONE FOOTER */}
+      <SidebarFooter className="mt-auto p-4">
         {usage && (
-          <div className="rounded-lg bg-sidebar-accent/50 p-3 mb-3">
-            <p className="text-xs font-medium text-sidebar-accent-foreground mb-3">
-              Current Plan: {usage.currentPlan.toUpperCase()}
-            </p>
+          <div className="relative mb-4 overflow-hidden rounded-2xl border border-white/10 bg-linear-to-br from-white/4 to-white/1 p-4 shadow-2xl backdrop-blur-md">
+            <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-purple-500/10 blur-3xl"></div>
 
-            <div className="space-y-2 mb-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-sidebar-accent-foreground/70">
-                  Meetings
-                </span>
-                <span className="text-xs text-sidebar-accent-foreground/70">
-                  {usage.meetingsThisMonth}/
-                  {limits.meetings === -1 ? "∞" : limits.meetings}
+            <div className="mb-5 flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+                Usage
+              </span>
+              <span className="rounded-sm bg-linear-to-r from-indigo-500 to-purple-600 px-1.5 py-0.5 text-[8px] font-bold tracking-widest text-white shadow-[0_0_15px_-3px_rgba(124,58,237,0.5)]">
+                {usage.currentPlan.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="mb-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-sidebar-foreground/80">Meetings</span>
+                <span className="text-[11px] font-bold text-sidebar-foreground/90">
+                  {usage.meetingsThisMonth} <span className="text-[10px] text-sidebar-foreground/40">/ {limits.meetings === -1 ? "∞" : limits.meetings}</span>
                 </span>
               </div>
-              {limits.meetings !== -1 && (
-                <div className="w-full bg-sidebar-accent/30 rounded-full h-2">
+              {limits.meetings !== -1 ? (
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/40 shadow-inner">
                   <div
-                    className="bg-sidebar-primary h-2 rounded-full transition-all duration-500 ease-out"
+                    className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-700 ease-out"
                     style={{ width: `${meetingProgress}%` }}
-                  >
-                    {" "}
-                  </div>
+                  />
                 </div>
-              )}
-              {limits.meetings === -1 && (
-                <div className="text-xs text-sidebar-accent-foreground/50 italic">
-                  Unlimited
-                </div>
+              ) : (
+                <div className="text-[10px] font-medium italic tracking-wide text-indigo-400/70">Unlimited Access</div>
               )}
             </div>
 
-            <div className="space-y-2 mb-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-sidebar-accent-foreground/70">
-                  Chat Messages
-                </span>
-                <span className="text-xs text-sidebar-accent-foreground/70">
-                  {usage.chatMessagesToday}/
-                  {limits.chatMessages === -1 ? "∞" : limits.chatMessages}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-sidebar-foreground/80">Chat Messages</span>
+                <span className="text-[11px] font-bold text-sidebar-foreground/90">
+                  {usage.chatMessagesToday} <span className="text-[10px] text-sidebar-foreground/40">/ {limits.chatMessages === -1 ? "∞" : limits.chatMessages}</span>
                 </span>
               </div>
-              {limits.chatMessages !== -1 && (
-                <div className="w-full bg-sidebar-accent/30 rounded-full h-2">
+              {limits.chatMessages !== -1 ? (
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/40 shadow-inner">
                   <div
-                    className="bg-sidebar-primary h-2 rounded-full transition-all duration-500 ease-out"
+                    className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-700 ease-out"
                     style={{ width: `${chatProgress}%` }}
-                  >
-                    {" "}
-                  </div>
+                  />
                 </div>
-              )}
-              {limits.chatMessages === -1 && (
-                <div className="text-xs text-sidebar-accent-foreground/50 italic">
-                  Unlimited
-                </div>
+              ) : (
+                <div className="text-[10px] font-medium italic tracking-wide text-indigo-400/70">Unlimited Access</div>
               )}
             </div>
           </div>
         )}
 
         {upgradeInfo && (
-          <div className="rounded-lg bg-sidebar-accent p-4">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-linear-to-br from-white/4 to-white/1 p-4 shadow-2xl backdrop-blur-md">
             <div className="space-y-3">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-sidebar-accent-foreground">
+                <p className="text-sm font-semibold text-sidebar-foreground/90">
                   {upgradeInfo.title}
                 </p>
-                <p className="text-xs text-sidebar-accent-foreground/70">
+                <p className="text-xs text-sidebar-foreground/60 leading-relaxed">
                   {upgradeInfo.description}
                 </p>
               </div>
-              {upgradeInfo.showButton && (
-                <Link href="/pricing">
-                  <Button className="w-full rounded-md bg-sidebar-primary px-3 py-2 text-xs font-medium text-sidebar-primary-foreground transition-colors hover:bg-sidebar-primary/90 cursor-pointer">
-                    {upgradeInfo.title}
+              {upgradeInfo.showButton ? (
+                <Link href="/pricing" className="block mt-2">
+                  <Button className="group relative w-full overflow-hidden rounded-lg bg-linear-to-r from-violet-600 to-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-[0_0_20px_-5px_rgba(124,58,237,0.4)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_-5px_rgba(124,58,237,0.6)] cursor-pointer">
+                    <div className="absolute inset-0 flex h-full w-full justify-center transform-[skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(150%)]">
+                      <div className="relative h-full w-8 bg-white/20" />
+                    </div>
+                    <span className="relative flex items-center justify-center gap-2">
+                      {upgradeInfo.title}
+                    </span>
                   </Button>
                 </Link>
-              )}
-
-              {!upgradeInfo.showButton && (
+              ) : (
                 <div className="text-center py-2">
-                  <span className="text-xs text-sidebar-accent-foreground/60">
+                  <span className="text-xs text-indigo-400 font-medium tracking-wide">
                     🎉 Thank you for your support!
                   </span>
                 </div>
@@ -233,11 +225,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
-
-// This component defines the sidebar for the application, including navigation links and a footer that displays the user's current plan and usage.
-// It also provides an upgrade prompt based on the user's current plan.
-// The sidebar uses the `usePathname` hook to determine the current route and highlight the active menu item.
-//  It also uses the `useUsage` context to fetch the user's usage data and limits, which are displayed in the footer along with a progress bar.
-//  Depending on the user's current plan, an upgrade prompt is shown with a button that links to the pricing page.
-// useContext is used to access the usage data, and the component is styled using Tailwind CSS classes.

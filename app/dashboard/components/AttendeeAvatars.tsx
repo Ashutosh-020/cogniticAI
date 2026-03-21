@@ -1,40 +1,104 @@
-import React from 'react'
+import React, { useState } from 'react'
+
 interface AttendeeAvatarsProps {
   attendees: any
   getAttendeeList: (attendees: any) => string[]
   getInitials: (name: string) => string
 }
 
-
-
 function AttendeeAvatars({ attendees, getAttendeeList, getInitials }: AttendeeAvatarsProps) {
   const attendeeList = getAttendeeList(attendees)
+
+  const [open, setOpen] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+
+  const visibleAvatars = attendeeList.slice(0, 5)
+  const remaining = attendeeList.length - 5
+
+  const popoverList = showAll
+    ? attendeeList
+    : attendeeList.slice(0, 10)
+
   return (
-    <div className='flex -space-x-2'>
-      {attendeeList.slice(0, 4).map((attendee, index) => (
-        <div
-          key={index}
-          className='relative group'
-          title={attendee}
-        >
-          <div className='w-6 h-6 rounded-full bg-linear-to-br from-blue-500 to-blue-600 border-2 border-background flex items-center justify-center text-white text-xs font-medium hover:scale-110 transition-transform cursor-pointer'>
+    <div
+      className="relative flex -space-x-2"
+      onMouseEnter={(e) => e.stopPropagation()} // ✅ FIX hover leak
+    >
+
+      {/* Avatars */}
+      {visibleAvatars.map((attendee, index) => (
+        <div key={index} className="relative group/avatar">
+          
+          <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 border-2 border-background flex items-center justify-center text-white text-xs font-medium hover:scale-110 transition-transform cursor-pointer select-none">
             {getInitials(attendee)}
           </div>
-          <div className='absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10'>
+
+          {/* Tooltip */}
+          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/avatar:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
             {attendee}
           </div>
         </div>
       ))}
-      {attendeeList.length > 4 && (
-        <div
-          className='w-6 h-6 rounded-full bg-gray-500 border-2 border-background flex items-center justify-center text-white text-xs font-medium'
-          title={`+${attendeeList.length - 4} more`}
 
-        >
-          +{attendeeList.length - 4}
+      {/* +X Avatar */}
+      {attendeeList.length > 5 && (
+        <div className="relative">
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+              setOpen(prev => !prev)
+            }}
+            className="w-8 h-8 rounded-full bg-gray-500 border-2 border-background flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:scale-110 transition-transform select-none"
+          >
+            +{remaining}
+          </div>
+
+          {/* Popover */}
+          {open && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()} // ✅ prevent click-through
+              className="
+                absolute top-9 right-0
+                w-72 min-w-65
+                bg-card border border-border rounded-lg shadow-lg p-2
+                z-999 isolate pointer-events-auto
+              "
+            >
+              <div className="max-h-60 overflow-y-auto">
+                {popoverList.map((attendee, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted text-sm"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs select-none">
+                      {getInitials(attendee)}
+                    </div>
+
+                    {/* FIX: full email visible */}
+                    <span className="break-all">
+                      {attendee}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* View All Button */}
+              {!showAll && attendeeList.length > 10 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowAll(true)
+                  }}
+                  className="w-full mt-2 text-xs text-primary hover:underline"
+                >
+                  View All
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
-
     </div>
   )
 }

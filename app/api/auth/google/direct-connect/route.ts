@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import 'dotenv/config'
 
 export async function GET() {
     try {

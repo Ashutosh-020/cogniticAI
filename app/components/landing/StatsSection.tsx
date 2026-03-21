@@ -2,36 +2,39 @@ import React from 'react'
 
 function StatsSection() {
     return (
-
         <section className='py-20 bg-black'>
             <div className='max-w-6xl mx-auto px-4'>
                 <div className='grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8'>
+                    
                     <div className='text-center group'>
-                        <div className='text-3xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600  bg-clip-text text-transparent mb-2'>
+                        <div className='text-3xl lg:text-4xl xl:text-5xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2'>
                             200+
                         </div>
                         <p className='text-gray-400'>Monthly Active Users</p>
                     </div>
+
                     <div className='text-center group'>
-                        <div className='text-3xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600  bg-clip-text text-transparent mb-2'>
+                        <div className='text-3xl lg:text-4xl xl:text-5xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2'>
                             99.69%
                         </div>
                         <p className='text-gray-400'>Uptime</p>
                     </div>
+
                     <div className='text-center group'>
-                        <div className='text-3xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600  bg-clip-text text-transparent mb-2'>
+                        <div className='text-3xl lg:text-4xl xl:text-5xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2'>
                             2min
                         </div>
                         <p className='text-gray-400'>Setup Time</p>
                     </div>
+
                     <div className='text-center group'>
-                        <div className='text-3xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600  bg-clip-text text-transparent mb-2'>
+                        <div className='text-3xl lg:text-4xl xl:text-5xl font-bold bg-linear-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2'>
                             50hrs
                         </div>
                         <p className='text-gray-400'>Saved Per Month</p>
                     </div>
-                </div>
 
+                </div>
             </div>
         </section>
     )
