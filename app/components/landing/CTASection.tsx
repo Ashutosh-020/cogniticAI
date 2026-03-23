@@ -1,5 +1,6 @@
 'use client'
 
+import { BackgroundBeamsWithCollision } from '@/components/ui/background-beams-with-collision'
 import { Button } from '@/components/ui/button'
 import { SignUpButton, useUser } from '@clerk/nextjs'
 import { ArrowRight, Star } from 'lucide-react'
@@ -9,8 +10,9 @@ import React from 'react'
 function CTASection() {
     const { isSignedIn } = useUser()
     return (
-        <section className="relative overflow-hidden bg-black py-24">
-            {/* Ambient Background Glow to draw the eye to the CTA */}
+        <section className="relative overflow-hidden">
+            <BackgroundBeamsWithCollision>
+                {/* Ambient Background Glow to draw the eye to the CTA */}
             <div className="pointer-events-none absolute left-1/2 top-1/2 h-100 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/10 blur-[120px]" />
 
             <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
@@ -67,6 +69,8 @@ function CTASection() {
                 </div>
 
             </div>
+            </BackgroundBeamsWithCollision>
+            
         </section>
     )
 }

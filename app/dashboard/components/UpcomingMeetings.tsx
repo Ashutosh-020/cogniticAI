@@ -174,7 +174,7 @@ function UpcomingMeetings({
                                 >
                                     <Button 
                                         variant="secondary" 
-                                        className="h-8 w-full cursor-pointer gap-2 rounded-lg bg-secondary/60 text-xs font-medium text-secondary-foreground hover:bg-secondary transition-colors"
+                                        className="h-8 w-full cursor-pointer gap-2 rounded-lg bg-secondary/60 text-xs font-medium text-secondary-foreground hover:bg-white hover:text-black border transition-colors"
                                     >
                                         <Video className="size-3.5" />
                                         Join Meeting

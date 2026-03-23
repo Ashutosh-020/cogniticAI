@@ -92,13 +92,13 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border/60 bg-sidebar/50 p-4 backdrop-blur-xl">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Premium Icon Container */}
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-purple-500/20">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 via-indigo-500 to-pink-500 shadow-lg shadow-purple-500/20">
             <Sparkles className="h-5 w-5 text-white" strokeWidth={2} />
           </div>
 
           {/* Stacked Typography */}
           <div className="flex flex-col justify-center">
-            <span className="bg-linear-to-br from-sidebar-foreground to-sidebar-foreground/60 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+            <span className="bg-linear-to-br from-pink-600 via-violet-500 to-blue-400 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
               Cognitic
             </span>
             <span className="mt-0.5 text-[10px] font-semibold uppercase leading-none tracking-widest text-sidebar-foreground/50">
