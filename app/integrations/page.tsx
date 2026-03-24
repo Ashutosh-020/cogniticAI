@@ -53,6 +53,22 @@ export default function Integrations() {
                     <p className='text-gray-400 text-lg max-w-2xl'>
                         Connect your favorite tools to automatically route action items and insights directly from your meetings.
                     </p>
+                    {/* Tip / Prerequisite Notice */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className='mt-4 flex items-start gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 text-sm text-yellow-200'
+                    >
+                    <div className='mt-0.5'>
+                        <Sparkles className='w-4 h-4 text-yellow-400' />
+                    </div>
+                    <div>
+                        <span className='font-medium text-yellow-300'>Before connecting:</span>{' '}
+                        Make sure you already have an account and an active workspace/site on the selected platform (e.g., Jira, Trello, Asana). 
+                        Without an existing workspace, the integration may fail during authentication.
+                    </div>
+                    </motion.div>
                 </motion.div>
 
                 {/* Setup Modal Overlay */}

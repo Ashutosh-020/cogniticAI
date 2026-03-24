@@ -32,4 +32,5 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
 // The usePathname hook is used to get the current route, and the useAuth hook is used to check if the user is signed in.
 // If the sidebar should be shown, it wraps the children in a layout that includes the AppSidebar and a main content area. Otherwise, 
 // it just renders the children in a full-screen layout.
-// This allows for a cleaner user experience by hiding the sidebar on certain pages where it may not be relevant or necessary, such as the landing page or meeting pages for unauthenticated users.
+// This allows for a cleaner user experience by hiding the sidebar on certain pages where it may not be relevant or necessary,
+// such as the landing page or meeting pages for unauthenticated users.
