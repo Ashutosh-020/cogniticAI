@@ -11,7 +11,7 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
     free: { meetings: 0, chatMessages: 0 },
     gold: { meetings: 10, chatMessages: 30 },
     platinum: { meetings: 30, chatMessages: 100 },
-    diamond: { meetings: -1, chatMessages: -1 }
+    diamond: { meetings: -1, chatMessages: -1 },
 }
 
 export async function canUserSendBot(userId: string) {

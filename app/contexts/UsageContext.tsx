@@ -71,10 +71,10 @@ export function UsageProvider({ children }: { children: ReactNode }) {
         }
     }
     const incrementChatUsage = async () => {
-        if (!canChat) {
-            return
-        }
-
+        // if (!canChat) {
+        //     return
+        // }
+        // Server enforces limits; do not gate on canChat here (stale closure can skip a valid increment after a successful chat).
         try {
             const response = await fetch('/api/user/increment-chat', {
                 method: 'POST',
