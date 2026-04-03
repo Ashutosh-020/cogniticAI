@@ -5,6 +5,8 @@ interface PlanLimits {
     chatMessages: number
 }
 
+// Must match app/contexts/UsageContext.tsx PLAN_LIMITS (gold / platinum / diamond).
+// Legacy keys kept for existing DB values.
 const PLAN_LIMITS: Record<string, PlanLimits> = {
     free: { meetings: 0, chatMessages: 0 },
     gold: { meetings: 10, chatMessages: 30 },
@@ -22,7 +24,7 @@ export async function canUserSendBot(userId: string) {
     }
 
     if (user.currentPlan === 'free' || user.subscriptionStatus === 'expired') {
-        return { allowed: false, reason: 'Upgrade your plan to send bots to meetings' }
+        return { allowed: false, reason: 'Unlock meeting bots by upgrading your plan.' }
     }
 
     const limits = PLAN_LIMITS[user.currentPlan]
@@ -51,17 +53,17 @@ export async function canUserChat(userId: string) {
     }
 
     if (user.currentPlan === 'free' || user.subscriptionStatus === 'expired') {
-        return { allowed: false, reason: 'Upgrade your plan to chat with out AI bot' }
+        return { allowed: false, reason: 'Upgrade now to unlock powerful AI chat capabilities.' }
     }
 
     const limits = PLAN_LIMITS[user.currentPlan]
 
     if (!limits) {
-        return { allowed: false, reason: 'invalid subscription plan' }
+        return { allowed: false, reason: 'Invalid subscription plan' }
     }
 
     if (limits.chatMessages !== -1 && user.chatMessagesToday >= limits.chatMessages) {
-        return { allowed: false, reason: `you've reached your daily limit of ${limits.chatMessages} messages` }
+        return { allowed: false, reason: `You've reached your daily limit of ${limits.chatMessages} messages` }
     }
 
     return { allowed: true }
