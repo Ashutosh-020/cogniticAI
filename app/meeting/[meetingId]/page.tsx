@@ -1,14 +1,33 @@
 'use client'
 
-import React from 'react'
+import dynamic from 'next/dynamic'
+import React, { useMemo } from 'react'
 import { useMeetingDetail } from './hooks/useMeetingDetail'
 import MeetingHeader from './components/MeetingHeader'
 import MeetingInfo from './components/MeetingInfo'
 import { Button } from '@/components/ui/button'
-import ActionItems from './components/action-items/ActionItems'
-import TranscriptDisplay from './components/TranscriptDisplay'
-import ChatSidebar from './components/ChatSidebar'
-import CustomAudioPlayer from './components/AudioPlayer'
+
+const TranscriptDisplay = dynamic(
+    () => import('./components/TranscriptDisplay'),
+    {
+        loading: () => (
+            <div className='bg-card border border-border rounded-lg p-6 text-center'>
+                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4' />
+                <p className='text-muted-foreground'>Loading transcript..</p>
+            </div>
+        ),
+        ssr: false,
+    }
+)
+
+const ChatSidebar = dynamic(() => import('./components/ChatSidebar'), { ssr: false })
+
+const CustomAudioPlayer = dynamic(() => import('./components/AudioPlayer'), { ssr: false })
+
+const ActionItems = dynamic(
+    () => import('./components/action-items/ActionItems'),
+    { ssr: false }
+)
 
 function MeetingDetail() {
 
@@ -30,8 +49,14 @@ function MeetingDetail() {
         deleteActionItem,
         addActionItem,
         displayActionItems,
-        meetingInfoData
+        meetingInfoData,
+        isLoading: chatLoading,
     } = useMeetingDetail()
+
+    const slackActionItemsText = useMemo(
+        () => meetingData?.actionItems?.map((item) => `• ${item.text}`).join('\n') || '',
+        [meetingData?.actionItems]
+    )
 
     return (
         <div className='min-h-screen bg-background'>
@@ -40,7 +65,7 @@ function MeetingDetail() {
                 title={meetingData?.title || 'Meeting'}
                 meetingId={meetingId}
                 summary={meetingData?.summary}
-                actionItems={meetingData?.actionItems?.map(item => `• ${item.text}`).join('\n') || ''}
+                actionItems={slackActionItemsText}
                 isOwner={isOwner}
                 isLoading={!userChecked}
             />
@@ -194,6 +219,7 @@ function MeetingDetail() {
                         messages={messages}
                         chatInput={chatInput}
                         showSuggestions={showSuggestions}
+                        chatLoading={chatLoading}
                         onInputChange={handleInputChange}
                         onSendMessage={handleSendMessage}
                         onSuggestionClick={handleSuggestionClick}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { CalendarEvent } from '../hooks/useMeetings'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -12,6 +12,69 @@ import {
     CalendarPlus 
 } from 'lucide-react'
 import { format } from 'date-fns'
+
+const UpcomingEventCard = memo(function UpcomingEventCard({
+    event,
+    botOn,
+    onToggleBot,
+}: {
+    event: CalendarEvent
+    botOn: boolean
+    onToggleBot: (eventId: string) => void
+}) {
+    return (
+        <div className="group relative flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-primary/30 hover:shadow-md">
+            <div className="flex items-start justify-between gap-4">
+                <h4 className="line-clamp-2 text-sm font-semibold text-foreground leading-snug">
+                    {event.summary || 'Untitled Event'}
+                </h4>
+                <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground/70">
+                        Bot
+                    </span>
+                    <Switch
+                        checked={botOn}
+                        onCheckedChange={() => onToggleBot(event.id)}
+                        aria-label="Toggle bot for this meeting"
+                        className="cursor-pointer data-[state=checked]:bg-primary"
+                    />
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    <Clock className="size-3.5 text-foreground/50" />
+                    <span>
+                        {format(new Date(event.start?.dateTime || event.start?.date || ''), 'MMM d, h:mm a')}
+                    </span>
+                </div>
+                {event.attendees && event.attendees.length > 0 && (
+                    <div className="flex items-center gap-2">
+                        <Users className="size-3.5 text-foreground/50" />
+                        <span>{event.attendees.length} attendees</span>
+                    </div>
+                )}
+            </div>
+
+            {(event.hangoutLink || event.location) && (
+                <a
+                    href={event.hangoutLink || event.location || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1"
+                >
+                    <Button
+                        variant="secondary"
+                        className="h-8 w-full cursor-pointer gap-2 rounded-lg bg-secondary/60 text-xs font-medium text-secondary-foreground hover:bg-white hover:text-black border transition-colors"
+                    >
+                        <Video className="size-3.5" />
+                        Join Meeting
+                    </Button>
+                </a>
+            )}
+        </div>
+    )
+})
 
 interface UpcomingMeetingsProps {
     upcomingEvents: CalendarEvent[]
@@ -123,65 +186,14 @@ function UpcomingMeetings({
                     </p>
                 </div>
             ) : (
-                /* POPULATED STATE (EVENTS GRID/LIST) */
                 <div className="flex flex-col gap-3">
                     {upcomingEvents.map((event) => (
-                        <div 
-                            key={event.id} 
-                            className="group relative flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-primary/30 hover:shadow-md"
-                        >
-                            {/* Card Header: Title & Bot Toggle */}
-                            <div className="flex items-start justify-between gap-4">
-                                <h4 className="line-clamp-2 text-sm font-semibold text-foreground leading-snug">
-                                    {event.summary || 'Untitled Event'}
-                                </h4>
-                                <div className="flex shrink-0 items-center gap-2">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground/70">
-                                        Bot
-                                    </span>
-                                    <Switch
-                                        checked={!!botToggles[event.id]}
-                                        onCheckedChange={() => onToggleBot(event.id)}
-                                        aria-label="Toggle bot for this meeting"
-                                        className="cursor-pointer data-[state=checked]:bg-primary"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Card Body: Meta Info */}
-                            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
-                                <div className="flex items-center gap-2">
-                                    <Clock className="size-3.5 text-foreground/50" />
-                                    <span>
-                                        {format(new Date(event.start?.dateTime || event.start?.date || ''), 'MMM d, h:mm a')}
-                                    </span>
-                                </div>
-                                {event.attendees && event.attendees.length > 0 && (
-                                    <div className="flex items-center gap-2">
-                                        <Users className="size-3.5 text-foreground/50" />
-                                        <span>{event.attendees.length} attendees</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Card Footer: Action */}
-                            {(event.hangoutLink || event.location) && (
-                                <a
-                                    href={event.hangoutLink || event.location || '#'}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="mt-1"
-                                >
-                                    <Button 
-                                        variant="secondary" 
-                                        className="h-8 w-full cursor-pointer gap-2 rounded-lg bg-secondary/60 text-xs font-medium text-secondary-foreground hover:bg-white hover:text-black border transition-colors"
-                                    >
-                                        <Video className="size-3.5" />
-                                        Join Meeting
-                                    </Button>
-                                </a>
-                            )}
-                        </div>
+                        <UpcomingEventCard
+                            key={event.id}
+                            event={event}
+                            botOn={!!botToggles[event.id]}
+                            onToggleBot={onToggleBot}
+                        />
                     ))}
                 </div>
             )}
@@ -189,7 +201,7 @@ function UpcomingMeetings({
     )
 }
 
-export default UpcomingMeetings
+export default memo(UpcomingMeetings)
 
 // This component displays a list of upcoming meetings fetched from the user's calendar. It handles various states such as loading, error,
 // and empty states to provide a smooth user experience.

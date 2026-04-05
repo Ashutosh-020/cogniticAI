@@ -36,18 +36,36 @@ export function useChatCore({
         setShowSuggestions(false)
         setIsLoading(true)
 
-        const newMessage: ChatMessage = {
-            id: messages.length + 1,
-            content: chatInput,
-            isBot: false,
-            timestamp: new Date()
-        }
-
-        setMessages([...messages, newMessage])
-
         const currentInput = chatInput
-
         setChatInput('')
+
+        setMessages((prev) => {
+            const nextId = (prev.reduce((m, x) => Math.max(m, x.id), 0) || 0) + 1
+            return [
+                ...prev,
+                {
+                    id: nextId,
+                    content: currentInput,
+                    isBot: false,
+                    timestamp: new Date(),
+                },
+            ]
+        })
+
+        const appendBot = (content: string) => {
+            setMessages((prev) => {
+                const nextId = (prev.reduce((m, x) => Math.max(m, x.id), 0) || 0) + 1
+                return [
+                    ...prev,
+                    {
+                        id: nextId,
+                        content,
+                        isBot: true,
+                        timestamp: new Date(),
+                    },
+                ]
+            })
+        }
 
         try {
             const response = await fetch(apiEndpoint, {
@@ -61,44 +79,25 @@ export function useChatCore({
             const data = await response.json()
 
             if (response.ok) {
-                await incrementChatUsage()
-
-                const botMessage: ChatMessage = {
-                    id: messages.length + 2,
-                    content: data.answer || data.response,
-                    isBot: true,
-                    timestamp: new Date()
-                }
-                setMessages(prev => [...prev, botMessage])
+                appendBot(data.answer || data.response || '')
+                void incrementChatUsage()
             } else {
                 if (data.upgradeRequired) {
-                    const upgradeMessage: ChatMessage = {
-                        id: messages.length + 2,
-                        content: `${data.error} Upgrade to a pro plan to continue using this feature.`,
-                        isBot: true,
-                        timestamp: new Date()
-                    }
-                    setMessages(prev => [...prev, upgradeMessage])
+                    appendBot(
+                        `${data.error} Upgrade to a pro plan to continue using this feature.`
+                    )
                 } else {
-                    const errorMessage: ChatMessage = {
-                        id: messages.length + 2,
-                        content: data.error || 'An error occurred while processing your request.',
-                        isBot: true,
-                        timestamp: new Date()
-                    }
-                    setMessages(prev => [...prev, errorMessage])
+                    appendBot(
+                        data.error || 'An error occurred while processing your request.'
+                    )
                 }
             }
 
         } catch (error) {
             console.error('chat error:', error)
-            const errorMessage: ChatMessage = {
-                id: messages.length + 2,
-                content: 'Could not connect to the server. Please check your connection and try again.',
-                isBot: true,
-                timestamp: new Date()
-            }
-            setMessages(prev => [...prev, errorMessage])
+            appendBot(
+                'Could not connect to the server. Please check your connection and try again.'
+            )
         } finally {
             setIsLoading(false)
         }

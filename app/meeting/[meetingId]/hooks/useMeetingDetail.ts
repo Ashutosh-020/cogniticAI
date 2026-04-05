@@ -1,7 +1,7 @@
 import { useChatCore } from "@/app/hooks/chat/useChatCore"
 import { useAuth } from "@clerk/nextjs"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 export interface MeetingData {
     id: string
@@ -147,16 +147,16 @@ export function useMeetingDetail() {
     }, [meetingId, userId, isLoaded, userChecked])
 
 
-    const deleteActionItem = async (id: number) => {
+    const deleteActionItem = useCallback(async (id: number) => {
         if (!isOwner) {
             return
         }
 
         setLocalActionItems(prev => prev.filter(item => item.id !== id))
 
-    }
+    }, [isOwner])
 
-    const addActionItem = async (text: string) => {
+    const addActionItem = useCallback(async (text: string) => {
         if (!isOwner) {
             return
         }
@@ -170,27 +170,36 @@ export function useMeetingDetail() {
         } catch (error) {
             console.error('error refetching meeting data: ', error)
         }
-    }
+    }, [isOwner, meetingId])
 
-    const displayActionItems = localActionItems.length > 0
-        ? localActionItems.map((item: any) => ({
-            id: item.id,
-            text: item.text
-        }))
-        : []
+    const displayActionItems = useMemo(
+        () =>
+            localActionItems.length > 0
+                ? localActionItems.map((item: any) => ({
+                    id: item.id,
+                    text: item.text
+                }))
+                : [],
+        [localActionItems]
+    )
 
-
-    const meetingInfoData = meetingData ? {
-        title: meetingData.title,
-        date: new Date(meetingData.startTime).toLocaleDateString(),
-        time: `${new Date(meetingData.startTime).toLocaleTimeString()} - ${new Date(meetingData.endTime).toLocaleTimeString()}`,
-        userName: meetingData.user?.name || "User"
-    } : {
-        title: "loading...",
-        date: "loading...",
-        time: "loading...",
-        userName: "loading...",
-    }
+    const meetingInfoData = useMemo(
+        () =>
+            meetingData
+                ? {
+                    title: meetingData.title,
+                    date: new Date(meetingData.startTime).toLocaleDateString(),
+                    time: `${new Date(meetingData.startTime).toLocaleTimeString()} - ${new Date(meetingData.endTime).toLocaleTimeString()}`,
+                    userName: meetingData.user?.name || "User"
+                }
+                : {
+                    title: "loading...",
+                    date: "loading...",
+                    time: "loading...",
+                    userName: "loading...",
+                },
+        [meetingData]
+    )
 
     return {
         meetingId,

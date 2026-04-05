@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 
 interface AttendeeAvatarsProps {
   attendees: any
@@ -6,7 +6,7 @@ interface AttendeeAvatarsProps {
   getInitials: (name: string) => string
 }
 
-function AttendeeAvatars({ attendees, getAttendeeList, getInitials }: AttendeeAvatarsProps) {
+function AttendeeAvatarsInner({ attendees, getAttendeeList, getInitials }: AttendeeAvatarsProps) {
   const attendeeList = getAttendeeList(attendees)
 
   const [open, setOpen] = useState(false)
@@ -103,6 +103,7 @@ function AttendeeAvatars({ attendees, getAttendeeList, getInitials }: AttendeeAv
   )
 }
 
+const AttendeeAvatars = memo(AttendeeAvatarsInner)
 export default AttendeeAvatars
 
 // This component displays a list of attendee avatars with their initials. If there are more than 4 attendees, it shows a "+X more" avatar.

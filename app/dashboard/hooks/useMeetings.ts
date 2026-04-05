@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/nextjs"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 export interface CalendarEvent {
     id: string
@@ -40,15 +40,12 @@ export function useMeetings() {
     const [botToggles, setBotToggles] = useState<{ [key: string]: boolean }>({})
     const [initialLoading, setInitialLoading] = useState(true)
 
+    const upcomingEventsRef = useRef(upcomingEvents)
+    const botTogglesRef = useRef(botToggles)
+    upcomingEventsRef.current = upcomingEvents
+    botTogglesRef.current = botToggles
 
-    useEffect(() => {
-        if (userId) {
-            fetchUpcomingEvents()
-            fetchPastMeetings()
-        }
-    }, [userId])
-
-    const fetchUpcomingEvents = async () => {
+    const fetchUpcomingEvents = useCallback(async () => {
         setLoading(true)
         setError('')
 
@@ -93,9 +90,9 @@ export function useMeetings() {
         setLoading(false)
         setInitialLoading(false)
 
-    }
+    }, [])
 
-    const fetchPastMeetings = async () => {
+    const fetchPastMeetings = useCallback(async () => {
 
         setPastLoading(true)
         try {
@@ -115,25 +112,33 @@ export function useMeetings() {
             console.error('faild to fetch past meetings:', error)
         }
         setPastLoading(false)
-    }
+    }, [])
 
-    const toggleBot = async (eventId: string) => {
+    useEffect(() => {
+        if (!userId) return
+        void Promise.all([fetchUpcomingEvents(), fetchPastMeetings()])
+    }, [userId, fetchUpcomingEvents, fetchPastMeetings])
+
+    const toggleBot = useCallback(async (eventId: string) => {
         try {
-            const event = upcomingEvents.find(e => e.id === eventId)
+            const event = upcomingEventsRef.current.find(e => e.id === eventId)
             if (!event?.meetingId) {
                 return
             }
 
+            const previous = botTogglesRef.current[eventId]
+            const nextScheduled = !previous
+
             setBotToggles(prev => ({
                 ...prev,
-                [eventId]: !prev[eventId]
+                [eventId]: nextScheduled
             }))
 
             const response = await fetch(`/api/meetings/${event.meetingId}/bot-toggle`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    botScheduled: !botToggles[eventId]
+                    botScheduled: nextScheduled
                 })
             })
 
@@ -149,9 +154,9 @@ export function useMeetings() {
                 [eventId]: !prev[eventId]
             }))
         }
-    }
+    }, [])
 
-    const directOAuth = async () => {
+    const directOAuth = useCallback(async () => {
         setLoading(true)
         try {
             window.location.href = '/api/auth/google/direct-connect'
@@ -159,9 +164,9 @@ export function useMeetings() {
             setError('Failed to start direct OAuth')
             setLoading(false)
         }
-    }
+    }, [])
 
-    const getAttendeeList = (attendees: any): string[] => {
+    const getAttendeeList = useCallback((attendees: any): string[] => {
         if (!attendees) {
             return []
         }
@@ -176,16 +181,16 @@ export function useMeetings() {
             const attendeeString = String(attendees)
             return attendeeString.split(',').map(name => name.trim()).filter(Boolean)
         }
-    }
+    }, [])
 
-    const getInitials = (name: string): string => {
+    const getInitials = useCallback((name: string): string => {
         return name
             .split(' ')
             .map(word => word.charAt(0))
             .join('')
             .toUpperCase()
             .slice(0, 2)
-    }
+    }, [])
 
     return {
         userId,

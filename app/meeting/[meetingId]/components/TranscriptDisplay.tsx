@@ -1,5 +1,7 @@
 'use client'
 
+import { memo } from 'react'
+
 interface TranscriptWord {
     word: string
     start: number
@@ -16,26 +18,23 @@ interface TranscriptDisplayProps {
     transcript: TranscriptSegment[]
 }
 
-export default function TranscriptDisplay({ transcript }: TranscriptDisplayProps) {
-    const formatTime = (seconds: number) => {
-        const minutes = Math.floor(seconds / 60)
-        const secs = Math.floor(seconds % 60)
+function formatTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${minutes}:${secs.toString().padStart(2, '0')}`
+}
 
-        return `${minutes}:${secs.toString().padStart(2, '0')}`
+function getSpeakerSegmentTime(segment: TranscriptSegment) {
+    const startTime = segment.offset
+    const endTime = segment.words[segment.words.length - 1]?.end || segment.offset
+    return `${formatTime(startTime)} - ${formatTime(endTime)}`
+}
 
-    }
+function getSegmentText(segment: TranscriptSegment) {
+    return segment.words.map(word => word.word).join(' ')
+}
 
-    const getSpeakerSegmentTime = (segment: TranscriptSegment) => {
-        const startTime = segment.offset
-        const endTime = segment.words[segment.words.length - 1]?.end || segment.offset
-
-        return `${formatTime(startTime)} - ${formatTime(endTime)}`
-    }
-
-    const getSegmentText = (segment: TranscriptSegment) => {
-        return segment.words.map(word => word.word).join(' ')
-    }
-
+function TranscriptDisplay({ transcript }: TranscriptDisplayProps) {
     if (!transcript || transcript.length === 0) {
         return (
             <div className='bg-card rounded-lg p-6 border border-border text-center'>
@@ -54,7 +53,7 @@ export default function TranscriptDisplay({ transcript }: TranscriptDisplayProps
 
             <div className="space-y-4 max-h-96 overflow-y-auto">
                 {transcript.map((segment, index) => (
-                    <div key={index} className="pb-4 border-b border-border last:border-b-0">
+                    <div key={`${segment.offset}-${segment.speaker}-${index}`} className="pb-4 border-b border-border last:border-b-0">
                         <div className="flex items-center gap-3 mb-2">
                             <span className="font-medium text-foreground">
                                 {segment.speaker}
@@ -73,3 +72,5 @@ export default function TranscriptDisplay({ transcript }: TranscriptDisplayProps
         </div>
     )
 }
+
+export default memo(TranscriptDisplay)

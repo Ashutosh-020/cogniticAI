@@ -2,7 +2,7 @@ import { useUsage } from '@/app/contexts/UsageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Send } from 'lucide-react'
-import React from 'react'
+import React, { memo } from 'react'
 
 interface Message {
     id: number
@@ -15,15 +15,17 @@ interface ChatSidebarProps {
     messages: Message[]
     chatInput: string
     showSuggestions: boolean
+    chatLoading?: boolean
     onInputChange: (value: string) => void
     onSendMessage: () => void
     onSuggestionClick: (suggestion: string) => void
 }
 
-function ChatSidebar({
+function ChatSidebarInner({
     messages,
     chatInput,
     showSuggestions,
+    chatLoading = false,
     onInputChange,
     onSendMessage,
     onSuggestionClick
@@ -65,7 +67,7 @@ function ChatSidebar({
                     </div>
                 ))}
 
-                {messages.length > 0 && !messages[messages.length - 1].isBot && (
+                {chatLoading && (
                     <div className='flex justify-start'>
                         <div className='bg-muted text-foreground rounded-lg p-3'>
                             <p className='text-sm'>
@@ -136,4 +138,5 @@ function ChatSidebar({
     )
 }
 
+const ChatSidebar = memo(ChatSidebarInner)
 export default ChatSidebar

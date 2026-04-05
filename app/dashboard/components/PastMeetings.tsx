@@ -1,9 +1,87 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { PastMeeting } from '../hooks/useMeetings'
 import { Clock, ExternalLink, Video } from 'lucide-react'
 import AttendeeAvatars from './AttendeeAvatars'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
+
+const PastMeetingCard = memo(function PastMeetingCard({
+    meeting,
+    onMeetingClick,
+    getAttendeeList,
+    getInitials,
+}: {
+    meeting: PastMeeting
+    onMeetingClick: (id: string) => void
+    getAttendeeList: (attendees: any) => string[]
+    getInitials: (name: string) => string
+}) {
+    return (
+        <div
+            className="
+                relative
+                flex cursor-pointer flex-col
+                rounded-2xl border border-border/60 bg-card p-5
+                transition-colors duration-200
+                hover:border-primary/40 hover:bg-accent/30
+                overflow-visible
+            "
+            onClick={() => onMeetingClick(meeting.id)}
+        >
+            <div className="mb-3 flex items-start justify-between gap-4">
+                <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                    <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
+                        {meeting.title}
+                    </h3>
+
+                    {meeting.attendees && (
+                        <div
+                            className="shrink-0"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <AttendeeAvatars
+                                attendees={meeting.attendees}
+                                getAttendeeList={getAttendeeList}
+                                getInitials={getInitials}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                <span className="inline-flex shrink-0 items-center rounded-full border border-green-500/20 bg-green-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-green-500">
+                    Completed
+                </span>
+            </div>
+
+            {meeting.description && (
+                <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                    {meeting.description}
+                </p>
+            )}
+
+            <div className="mt-auto flex flex-col items-start justify-between gap-4 border-t border-border/40 pt-4 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <Clock className="size-4 text-foreground/40" />
+                    <span>
+                        {format(new Date(meeting.startTime), 'MMM d, yyyy • h:mm a')} -{' '}
+                        {format(new Date(meeting.endTime), 'h:mm a')}
+                    </span>
+                </div>
+
+                <div onClick={(e) => e.stopPropagation()}>
+                    <Button
+                        variant="secondary"
+                        className="h-8 cursor-pointer gap-2 rounded-lg bg-secondary/60 px-4 text-xs font-medium text-secondary-foreground hover:bg-secondary hover:text-foreground"
+                        onClick={() => onMeetingClick(meeting.id)}
+                    >
+                        View Details
+                        <ExternalLink className="size-3.5" />
+                    </Button>
+                </div>
+            </div>
+        </div>
+    )
+})
 
 interface PastMeetingsProps {
     pastMeetings: PastMeeting[]
@@ -64,83 +142,22 @@ function PastMeetings({
         )
     }
 
-    // Meeting Cards
     return (
         <div className="flex flex-col gap-4">
             {pastMeetings.map((meeting) => (
-                <div
+                <PastMeetingCard
                     key={meeting.id}
-                    className="
-                        relative
-                        flex cursor-pointer flex-col
-                        rounded-2xl border border-border/60 bg-card p-5
-                        transition-colors duration-200
-                        hover:border-primary/40 hover:bg-accent/30
-                        overflow-visible
-                    "
-                    onClick={() => onMeetingClick(meeting.id)}
-                >
-
-                    {/* Header */}
-                    <div className="mb-3 flex items-start justify-between gap-4">
-                        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                            <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
-                                {meeting.title}
-                            </h3>
-
-                            {meeting.attendees && (
-                                <div
-                                    className="shrink-0"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <AttendeeAvatars
-                                        attendees={meeting.attendees}
-                                        getAttendeeList={getAttendeeList}
-                                        getInitials={getInitials}
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        <span className="inline-flex shrink-0 items-center rounded-full border border-green-500/20 bg-green-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-green-500">
-                            Completed
-                        </span>
-                    </div>
-
-                    {/* Description */}
-                    {meeting.description && (
-                        <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                            {meeting.description}
-                        </p>
-                    )}
-
-                    {/* Footer */}
-                    <div className="mt-auto flex flex-col items-start justify-between gap-4 border-t border-border/40 pt-4 sm:flex-row sm:items-center">
-                        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                            <Clock className="size-4 text-foreground/40" />
-                            <span>
-                                {format(new Date(meeting.startTime), 'MMM d, yyyy • h:mm a')} - {format(new Date(meeting.endTime), 'h:mm a')}
-                            </span>
-                        </div>
-
-                        <div onClick={(e) => e.stopPropagation()}>
-                            <Button
-                                variant="secondary"
-                                className="h-8 cursor-pointer gap-2 rounded-lg bg-secondary/60 px-4 text-xs font-medium text-secondary-foreground hover:bg-secondary hover:text-foreground"
-                                onClick={() => onMeetingClick(meeting.id)}
-                            >
-                                View Details
-                                <ExternalLink className="size-3.5" />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                    meeting={meeting}
+                    onMeetingClick={onMeetingClick}
+                    getAttendeeList={getAttendeeList}
+                    getInitials={getInitials}
+                />
             ))}
         </div>
     )
 }
 
-export default PastMeetings
+export default memo(PastMeetings)
 
 
 // This component displays a list of past meetings with their details. It handles loading states and empty states gracefully, providing a good user experience.

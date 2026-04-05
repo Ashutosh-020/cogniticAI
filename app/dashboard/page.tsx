@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useMeetings } from './hooks/useMeetings'
 import { useRouter } from 'next/navigation'
 import PastMeetings from './components/PastMeetings'
@@ -27,9 +27,12 @@ function Home() {
     } = useMeetings()
 
     const router = useRouter()
-    const handleMeetingClick = (meetingId: string) => {
-        router.push(`/meeting/${meetingId}`)
-    }
+    const handleMeetingClick = useCallback(
+        (meetingId: string) => {
+            router.push(`/meeting/${meetingId}`)
+        },
+        [router]
+    )
     if (!userId) {
         return (
             <div className='flex items-center justify-center h-screen'>

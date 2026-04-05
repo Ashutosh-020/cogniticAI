@@ -82,11 +82,10 @@ export async function chatWithMeeting(
         };
     }
 
-    const results = await searchVectors(
-        questionEmbedding,
-        { userId, meetingId },
-        5
-    );
+    const [results, meeting] = await Promise.all([
+        searchVectors(questionEmbedding, { userId, meetingId }, 5),
+        prisma.meeting.findUnique({ where: { id: meetingId } }),
+    ]);
 
     if (!results.length) {
         return {
@@ -94,10 +93,6 @@ export async function chatWithMeeting(
             sources: []
         };
     }
-
-    const meeting = await prisma.meeting.findUnique({
-        where: { id: meetingId }
-    });
 
     const context = results
         .slice(0, 5) // limit context size (cost optimization)
