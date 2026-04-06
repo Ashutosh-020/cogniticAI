@@ -1,0 +1,13 @@
+{
+  "name": "bot-scheduler-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Lambda function for Cognitic",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0"
+  },
+  "devDependencies": {
+    "prisma": "7.5.0"
+  }
+}

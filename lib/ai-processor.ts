@@ -32,21 +32,25 @@ export async function processMeetingTranscript(transcript: any) {
             model: 'gemini-2.5-flash',
             contents: transcriptText,
             config: {
-                systemInstruction: `You are an AI assistant that analyzes meeting transcripts.
+                systemInstruction: `You are an AI assistant that analyzes meeting transcripts and provides concise summaries and action items.
 
-Return STRICT JSON ONLY in this format:
-{
-  "summary": "2-3 sentence summary",
-  "actionItems": ["item 1", "item 2"]
-}
+                    Please analyze the meeting transcript and provide:
+                    1. A clear, concise summary (3-4 sentences) of the main discussion points and decisions
+                    2. A list of specific action items mentioned in the meeting
 
-Rules:
-- No markdown
-- No explanation
-- No extra text
-- Only valid JSON`,
+                    Format your response as JSON:
+                    {
+                        "summary": "Your summary here",
+                        "actionItems": [
+                            "Action item description 1",
+                            "Action item description 2"
+                        ]
+                    }
+
+                    Return only the action item text as strings.
+                    If no clear action items are mentioned, return an empty array for actionItems.`,
                 temperature: 0.3,
-                maxOutputTokens: 500
+                maxOutputTokens: 1024
             }
         })
 
