@@ -18,28 +18,62 @@ export async function GET() {
     }
 
     const now = new Date();
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+    const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+
     const upcomingMeetings = await prisma.meeting.findMany({
       where: {
         userId: user.id,
-        startTime: { gte: now },
         isFromCalendar: true,
+        startTime: { lte: oneHourFromNow },
+        endTime: { gte: fifteenMinutesAgo },
+        meetingUrl: { not: null },
+        botScheduled: true,
+      },
+      select: {
+        id: true,
+        calendarEventId: true,
+        title: true,
+        startTime: true,
+        endTime: true,
+        meetingUrl: true,
+        attendees: true,
+        botScheduled: true,
+        botSent: true,
       },
       orderBy: { startTime: "asc" },
       take: 10,
     });
 
     const events = upcomingMeetings.map((meeting) => {
+      let parsedAttendees: any[] = [];
+      try {
+        const attendeesData = meeting.attendees;
+        if (typeof attendeesData === "string") {
+          parsedAttendees = JSON.parse(attendeesData || "[]");
+        } else if (Array.isArray(attendeesData)) {
+          parsedAttendees = attendeesData;
+        } else if (attendeesData) {
+          // If stored as JSON object but not string/array, handle fallback
+          parsedAttendees = JSON.parse(JSON.stringify(attendeesData || []));
+          if (!Array.isArray(parsedAttendees)) {
+            parsedAttendees = [];
+          }
+        }
+      } catch (e) {
+        parsedAttendees = [];
+      }
 
       return {
         id: meeting.calendarEventId || meeting.id,
-        summary: meeting.title,
-        start: { dateTime: meeting.startTime.toISOString() },
-        end: { dateTime: meeting.endTime.toISOString() },
-        attendees: meeting.attendees || [],
-        hangoutLink: meeting.meetingUrl,
-        conferenceData: meeting.meetingUrl ? { entryPoints: [{ uri: meeting.meetingUrl }] }: null,
+        title: meeting.title,
+        startTime: meeting.startTime.toISOString(),
+        endTime: meeting.endTime.toISOString(),
+        meetingUrl: meeting.meetingUrl,
+        attendees: parsedAttendees,
+        attendeesCount: parsedAttendees.length,
         botScheduled: meeting.botScheduled,
-        meetingId: meeting.id,
+        botSent: meeting.botSent,
       };
     });
 
@@ -60,15 +94,3 @@ export async function GET() {
     );
   }
 }
-
-// This route fetches upcoming meetings for the authenticated user from the database,
-//  filtering for meetings that are scheduled in the future and are sourced from the calendar.
-//  It returns a structured JSON response containing the meeting details, connection status, and source information.
-// The response includes an array of events with properties like id, summary, start and end times, attendees, hangout links, and conference data.
-// The route also handles authentication and error scenarios, ensuring that only authenticated users can access their meetings and providing appropriate error messages when issues arise.
-// Note: This route is designed to work with meetings that are stored in the database, which may include meetings that were created through the application or synced from an external calendar.
-//  It does not directly fetch meetings from the Google Calendar API, but rather relies on the data stored in the application's database.
-// This route is intended to be used by the frontend to display upcoming meetings to the user, allowing them to see their schedule and access meeting details directly from the application.
-// The route is optimized to return a limited number of upcoming meetings (up to 10) to ensure efficient data retrieval and display on the frontend.
-// Note: The route assumes that the meetings stored in the database have a structure that includes properties like title, startTime, endTime, attendees, meetingUrl, and calendarEventId.
-// Overall, this route serves as a crucial part of the application's functionality, enabling users to view their upcoming meetings and access relevant details in a seamless manner.
