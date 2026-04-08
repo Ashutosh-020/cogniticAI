@@ -1,10 +1,16 @@
 import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
+import { Pool } from "pg"
 
-const adapter = new PrismaPg({
+// Initialize the PostgreSQL connection pool properly
+const pool = new Pool({
     connectionString: process.env.DATABASE_URL
 })
 
+// Pass the pool to the Prisma adapter
+const adapter = new PrismaPg(pool)
+
+// Initialize Prisma globally to reuse across warm Lambda invocations
 const prisma = new PrismaClient({ adapter })
 
 export const handler = async (event) => {
@@ -35,13 +41,17 @@ async function syncAllUserCalendars() {
         }
     })
 
-    for (const user of users) {
-        try {
-            await syncUserCalendar(user)
-        } catch (error) {
-            console.error(`sync failed for ${user.id}:`, error.message)
+    // Process all users concurrently to prevent Lambda timeouts
+    const results = await Promise.allSettled(
+        users.map(user => syncUserCalendar(user))
+    )
+
+    // Log any failures without crashing the whole batch
+    results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+            console.error(`sync failed for ${users[index].id}:`, result.reason)
         }
-    }
+    })
 }
 
 async function syncUserCalendar(user) {
@@ -342,9 +352,9 @@ async function canUserScheduleMeeting(user) {
     try {
         const PLAN_LIMITS = {
             free: { meetings: 0 },
-            starter: { meetings: 10 },
-            pro: { meetings: 30 },
-            premium: { meetings: -1 }
+            gold: { meetings: 10 },
+            platinum: { meetings: 30 },
+            diamond: { meetings: -1 }
         }
 
         const limits = PLAN_LIMITS[user.currentPlan] || PLAN_LIMITS.free
@@ -377,4 +387,3 @@ async function incrementMeetingUsage(userId) {
         console.error('error incrementing meeting usage:', error)
     }
 }
-

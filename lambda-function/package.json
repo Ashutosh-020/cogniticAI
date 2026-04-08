@@ -5,7 +5,8 @@
   "description": "Lambda function for Cognitic",
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
-    "@prisma/client": "^7.5.0"
+    "@prisma/client": "^7.5.0",
+    "google-auth-library": "^9.0.0"
   },
   "devDependencies": {
     "prisma": "7.5.0"
