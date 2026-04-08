@@ -31,7 +31,7 @@ const UpcomingEventCard = memo(function UpcomingEventCard({
         <div className="group relative flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-primary/30 hover:shadow-md">
             <div className="flex items-start justify-between gap-4">
                 <h4 className="line-clamp-2 text-sm font-semibold text-foreground leading-snug">
-                    {event.summary || 'Untitled Event'}
+                    {(event as any).title || event.summary || 'Untitled Event'}
                 </h4>
                 <div className="flex shrink-0 items-center gap-2">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground transition-colors group-hover:text-foreground/70">
@@ -66,9 +66,9 @@ const UpcomingEventCard = memo(function UpcomingEventCard({
                 )}
             </div>
 
-            {(event.hangoutLink || event.location) && (
+            {((event as any).meetingUrl || event.hangoutLink || event.location) && (
                 <a
-                    href={event.hangoutLink || event.location || '#'}
+                    href={(event as any).meetingUrl || event.hangoutLink || event.location || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-1"

@@ -73,8 +73,8 @@ export async function GET() {
       return {
         id: meeting.calendarEventId || meeting.id,
         title: meeting.title,
-        startTime: safeToISO(meeting.startTime),
-        endTime: safeToISO(meeting.endTime),
+        startTime: meeting.startTime ? safeToISO(meeting.startTime) : null,
+        endTime: meeting.endTime ? safeToISO(meeting.endTime) : null,
         meetingUrl: meeting.meetingUrl,
         attendees: parsedAttendees,
         attendeesCount: parsedAttendees.length,
@@ -82,6 +82,8 @@ export async function GET() {
         botSent: meeting.botSent,
       };
     });
+
+    console.log("API EVENTS:", events);
 
     return NextResponse.json({
       events,
