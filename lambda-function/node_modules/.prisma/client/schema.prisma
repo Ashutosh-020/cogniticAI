@@ -1,18 +1,19 @@
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
-  previewFeatures = ["driverAdapters"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id      String  @id @default(cuid())
-  clerkId String  @unique
-  email   String?
-  name    String?
+  id       String    @id
+  clerkId  String    @unique
+  email    String?
+  name     String?
+  meetings Meeting[]
 
   botName     String? @default("Meeting Bot")
   botImageUrl String?
@@ -36,9 +37,8 @@ model User {
   meetingsThisMonth    Int       @default(0)
   chatMessagesToday    Int       @default(0)
 
-  meetings  Meeting[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SlackInstallation {
@@ -86,11 +86,11 @@ model Meeting {
   ragProcessed   Boolean   @default(false)
   ragProcessedAt DateTime?
 
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  TranscriptChunk TranscriptChunk[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  TranscriptChunk TranscriptChunk[]
 }
 
 model UserIntegration {

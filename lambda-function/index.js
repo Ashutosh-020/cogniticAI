@@ -1,21 +1,11 @@
 import { PrismaClient } from "@prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
-import { Pool } from "pg"
 
-// Initialize the PostgreSQL connection pool properly
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL
-})
-
-// Pass the pool to the Prisma adapter
-const adapter = new PrismaPg(pool)
-
-// Initialize Prisma globally to reuse across warm Lambda invocations
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 
 export const handler = async (event) => {
     try {
         await syncAllUserCalendars()
+
         await scheduleBotsForUpcomingMeetings()
 
         return {
@@ -28,6 +18,8 @@ export const handler = async (event) => {
             statusCode: 500,
             body: JSON.stringify({ error: 'internal server error', details: error.message })
         }
+    } finally {
+        await prisma.$disconnect()
     }
 }
 
@@ -41,17 +33,13 @@ async function syncAllUserCalendars() {
         }
     })
 
-    // Process all users concurrently to prevent Lambda timeouts
-    const results = await Promise.allSettled(
-        users.map(user => syncUserCalendar(user))
-    )
-
-    // Log any failures without crashing the whole batch
-    results.forEach((result, index) => {
-        if (result.status === 'rejected') {
-            console.error(`sync failed for ${users[index].id}:`, result.reason)
+    for (const user of users) {
+        try {
+            await syncUserCalendar(user)
+        } catch (error) {
+            console.error(`sync failed for ${user.id}:`, error.message)
         }
-    })
+    }
 }
 
 async function syncUserCalendar(user) {
@@ -64,11 +52,11 @@ async function syncUserCalendar(user) {
 
         if (tokenExpiry <= tenMinutesFromNow) {
             accessToken = await refreshGoogleToken(user)
-            if (!accessToken) return
+            if (!accessToken) {
+                return
+            }
         }
-
         const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-
         const response = await fetch(
             `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
             `timeMin=${now.toISOString()}&` +
@@ -81,37 +69,38 @@ async function syncUserCalendar(user) {
                 }
             }
         )
-
         if (!response.ok) {
             if (response.status === 401) {
                 await prisma.user.update({
-                    where: { id: user.id },
-                    data: { calendarConnected: false }
+                    where: {
+                        id: user.id
+                    },
+                    data: {
+                        calendarConnected: false
+                    }
                 })
                 return
             }
             throw new Error(`Calendar API failed: ${response.status}`)
         }
-
         const data = await response.json()
         const events = data.items || []
-
         const existingEvents = await prisma.meeting.findMany({
             where: {
                 userId: user.id,
                 isFromCalendar: true,
-                startTime: { gte: now }
+                startTime: {
+                    gte: now
+                }
             }
         })
 
         const googleEventIds = new Set()
-
         for (const event of events) {
             if (event.status === 'cancelled') {
                 await handleDeletedEvent(event)
                 continue
             }
-
             googleEventIds.add(event.id)
             await processEvent(user, event)
         }
@@ -120,17 +109,21 @@ async function syncUserCalendar(user) {
             dbEvent => !googleEventIds.has(dbEvent.calendarEventId)
         )
 
-        for (const deletedEvent of deletedEvents) {
-            await handleDeletedEventFromDB(deletedEvent)
+        if (deletedEvents.length > 0) {
+            for (const deletedEvent of deletedEvents) {
+                await handleDeletedEventFromDB(user, deletedEvent)
+            }
         }
-
     } catch (error) {
         console.error(`calendar error for ${user.id}:`, error.message)
-
         if (error.message.includes('401') || error.message.includes('403')) {
             await prisma.user.update({
-                where: { id: user.id },
-                data: { calendarConnected: false }
+                where: {
+                    id: user.id
+                },
+                data: {
+                    calendarConnected: false
+                }
             })
         }
     }
@@ -140,7 +133,9 @@ async function refreshGoogleToken(user) {
     try {
         if (!user.googleRefreshToken) {
             await prisma.user.update({
-                where: { id: user.id },
+                where: {
+                    id: user.id
+                },
                 data: {
                     calendarConnected: false,
                     googleAccessToken: null
@@ -161,51 +156,58 @@ async function refreshGoogleToken(user) {
                 grant_type: 'refresh_token'
             })
         })
-
         const tokens = await response.json()
 
         if (!tokens.access_token) {
             await prisma.user.update({
-                where: { id: user.id },
-                data: { calendarConnected: false }
+                where: {
+                    id: user.id
+                },
+                data: {
+                    calendarConnected: false
+                }
             })
             return null
         }
 
         await prisma.user.update({
-            where: { id: user.id },
+            where: {
+                id: user.id
+            },
             data: {
                 googleAccessToken: tokens.access_token,
                 googleTokenExpiry: new Date(Date.now() + (tokens.expires_in * 1000))
             }
         })
-
         return tokens.access_token
-
     } catch (error) {
         console.error(`token refresh error for ${user.clerkId}: `, error)
-
         await prisma.user.update({
-            where: { id: user.id },
-            data: { calendarConnected: false }
+            where: {
+                id: user.id
+            },
+            data: {
+                calendarConnected: false
+            }
         })
-
         return null
     }
 }
 
 async function handleDeletedEvent(event) {
     try {
-        const existingMeeting = await prisma.meeting.findUnique({
-            where: { calendarEventId: event.id }
+        const exsistingMeeting = await prisma.meeting.findUnique({
+            where: {
+                calendarEventId: event.id
+            }
         })
-
-        if (existingMeeting) {
+        if (exsistingMeeting) {
             await prisma.meeting.delete({
-                where: { calendarEventId: event.id }
+                where: {
+                    calendarEventId: event.id
+                }
             })
         }
-
     } catch (error) {
         console.error('error deleting event:', error.message)
     }
@@ -213,20 +215,24 @@ async function handleDeletedEvent(event) {
 
 async function handleDeletedEventFromDB(dbEvent) {
     await prisma.meeting.delete({
-        where: { id: dbEvent.id }
+        where: {
+            id: dbEvent.id
+        }
     })
 }
 
 async function processEvent(user, event) {
     const meetingUrl = event.hangoutLink || event.conferenceData?.entryPoints?.[0]?.uri
-    if (!meetingUrl || !event.start?.dateTime) return
+    if (!meetingUrl || !event.start?.dateTime) {
+        return
+    }
 
     const eventData = {
         calendarEventId: event.id,
         userId: user.id,
         title: event.summary || 'Untitled Meeting',
         description: event.description || null,
-        meetingUrl,
+        meetingUrl: meetingUrl,
         startTime: new Date(event.start.dateTime),
         endTime: new Date(event.end.dateTime),
         attendees: event.attendees ? JSON.stringify(event.attendees.map(a => a.email)) : null,
@@ -235,11 +241,19 @@ async function processEvent(user, event) {
     }
 
     try {
-        const existingMeeting = await prisma.meeting.findUnique({
-            where: { calendarEventId: event.id }
+        const exsistingMeeting = await prisma.meeting.findUnique({
+            where: {
+                calendarEventId: event.id
+            }
         })
 
-        if (existingMeeting) {
+        if (exsistingMeeting) {
+            const changes = []
+            if (exsistingMeeting.title !== eventData.title) changes.push('title')
+            if (exsistingMeeting.startTime.getTime() !== eventData.startTime.getTime()) changes.push('time')
+            if (exsistingMeeting.meetingUrl !== eventData.meetingUrl) changes.push('meeting url')
+            if (exsistingMeeting.attendees !== eventData.attendees) changes.push('attendees')
+
             const updateData = {
                 title: eventData.title,
                 description: eventData.description,
@@ -249,19 +263,20 @@ async function processEvent(user, event) {
                 attendees: eventData.attendees
             }
 
-            if (!existingMeeting.botSent) {
-                updateData.botScheduled = true
+            if (!exsistingMeeting.botSent) {
+                updateData.botScheduled = eventData.botScheduled
             }
-
             await prisma.meeting.update({
-                where: { calendarEventId: event.id },
+                where: {
+                    calendarEventId: event.id
+                },
                 data: updateData
             })
-
         } else {
-            await prisma.meeting.create({ data: eventData })
+            await prisma.meeting.create({
+                data: eventData
+            })
         }
-
     } catch (error) {
         console.error(`error for ${event.id}:`, error.message)
     }
@@ -269,26 +284,46 @@ async function processEvent(user, event) {
 
 async function scheduleBotsForUpcomingMeetings() {
     const now = new Date()
-    const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000)
 
-    const upcomingMeetings = await prisma.meeting.findMany({
+    // BUFFER WINDOWS
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000)
+    const tenMinutesFromNow = new Date(now.getTime() + 10 * 60 * 1000)
+
+    console.log("NOW:", now)
+    console.log("WINDOW:", fifteenMinutesAgo, "→", tenMinutesFromNow)
+
+    const meetings = await prisma.meeting.findMany({
         where: {
+            // KEY FIX: handle past + ongoing + upcoming
             startTime: {
-                gte: now,
-                lte: fiveMinutesFromNow
+                lte: tenMinutesFromNow
             },
+            endTime: {
+                gte: fifteenMinutesAgo
+            },
+
             botScheduled: true,
             botSent: false,
-            meetingUrl: { not: null }
+            meetingUrl: {
+                not: null
+            }
         },
-        include: { user: true }
+        include: {
+            user: true
+        }
     })
 
-    for (const meeting of upcomingMeetings) {
+    console.log("MEETINGS FOUND:", meetings.length)
+
+    for (const meeting of meetings) {
         try {
+            console.log("PROCESSING:", meeting.title)
+
             const canSchedule = await canUserScheduleMeeting(meeting.user)
 
             if (!canSchedule.allowed) {
+                console.log("SKIPPED:", canSchedule.reason)
+
                 await prisma.meeting.update({
                     where: { id: meeting.id },
                     data: {
@@ -301,7 +336,7 @@ async function scheduleBotsForUpcomingMeetings() {
 
             const requestBody = {
                 meeting_url: meeting.meetingUrl,
-                bot_name: meeting.user.botName || 'AI Noteetaker',
+                bot_name: meeting.user.botName || 'AI Notetaker',
                 reserved: false,
                 recording_mode: 'speaker_view',
                 speech_to_text: { provider: "Default" },
@@ -316,6 +351,8 @@ async function scheduleBotsForUpcomingMeetings() {
                 requestBody.bot_image = meeting.user.botImageUrl
             }
 
+            console.log("CALLING MEETINGBAAS...")
+
             const response = await fetch('https://api.meetingbaas.com/bots', {
                 method: 'POST',
                 headers: {
@@ -326,10 +363,13 @@ async function scheduleBotsForUpcomingMeetings() {
             })
 
             if (!response.ok) {
-                throw new Error(`meeting baas api req failed: ${response.status}`)
+                const errorText = await response.text()
+                throw new Error(`MeetingBaaS failed: ${response.status} - ${errorText}`)
             }
 
             const data = await response.json()
+
+            console.log("BOT CREATED:", data.bot_id)
 
             await prisma.meeting.update({
                 where: { id: meeting.id },
@@ -343,7 +383,7 @@ async function scheduleBotsForUpcomingMeetings() {
             await incrementMeetingUsage(meeting.userId)
 
         } catch (error) {
-            console.error(`bot failed for ${meeting.title}: `, error.message)
+            console.error(`BOT FAILED (${meeting.title}):`, error.message)
         }
     }
 }
@@ -356,31 +396,43 @@ async function canUserScheduleMeeting(user) {
             platinum: { meetings: 30 },
             diamond: { meetings: -1 }
         }
-
         const limits = PLAN_LIMITS[user.currentPlan] || PLAN_LIMITS.free
 
         if (user.currentPlan === 'free' || user.subscriptionStatus !== 'active') {
-            return { allowed: false }
+            return {
+                allowed: false,
+                reason: `${user.currentPlan === 'free' ? 'Free plan' : 'Inactive subscription'} - upgrade required`
+            }
         }
 
         if (limits.meetings !== -1 && user.meetingsThisMonth >= limits.meetings) {
-            return { allowed: false }
+            return {
+                allowed: false,
+                reason: `Monthly limit reached (${user.meetingsThisMonth}/${limits.meetings})`
+            }
         }
-
-        return { allowed: true }
-
+        return {
+            allowed: true
+        }
     } catch (error) {
         console.error('error checking meeting limits:', error)
-        return { allowed: false }
+        return {
+            allowed: false,
+            reason: 'Error chekcing limits '
+        }
     }
 }
 
 async function incrementMeetingUsage(userId) {
     try {
         await prisma.user.update({
-            where: { id: userId },
+            where: {
+                id: userId
+            },
             data: {
-                meetingsThisMonth: { increment: 1 }
+                meetingsThisMonth: {
+                    increment: 1
+                }
             }
         })
     } catch (error) {
