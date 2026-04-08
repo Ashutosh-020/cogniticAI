@@ -5,6 +5,11 @@ import AttendeeAvatars from './AttendeeAvatars'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 
+const safeDate = (value: any) => {
+    const d = value ? new Date(value) : null;
+    return d && !isNaN(d.getTime()) ? d : null;
+};
+
 const PastMeetingCard = memo(function PastMeetingCard({
     meeting,
     onMeetingClick,
@@ -63,8 +68,11 @@ const PastMeetingCard = memo(function PastMeetingCard({
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                     <Clock className="size-4 text-foreground/40" />
                     <span>
-                        {format(new Date(meeting.startTime), 'MMM d, yyyy • h:mm a')} -{' '}
-                        {format(new Date(meeting.endTime), 'h:mm a')}
+                        {(() => {
+                            const s = safeDate(meeting.startTime);
+                            const e = safeDate(meeting.endTime);
+                            return (s ? format(s, 'MMM d, yyyy • h:mm a') : "Invalid date") + ' - ' + (e ? format(e, 'h:mm a') : "Invalid time");
+                        })()}
                     </span>
                 </div>
 

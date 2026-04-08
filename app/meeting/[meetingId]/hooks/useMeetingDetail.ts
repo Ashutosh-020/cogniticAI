@@ -184,12 +184,19 @@ export function useMeetingDetail() {
     )
 
     const meetingInfoData = useMemo(
-        () =>
-            meetingData
+        () => {
+            const safeDate = (value: any) => {
+                const d = value ? new Date(value) : null;
+                return d && !isNaN(d.getTime()) ? d : null;
+            };
+            const sTime = safeDate(meetingData?.startTime);
+            const eTime = safeDate(meetingData?.endTime);
+
+            return meetingData
                 ? {
                     title: meetingData.title,
-                    date: new Date(meetingData.startTime).toLocaleDateString(),
-                    time: `${new Date(meetingData.startTime).toLocaleTimeString()} - ${new Date(meetingData.endTime).toLocaleTimeString()}`,
+                    date: sTime ? sTime.toLocaleDateString() : "Invalid date",
+                    time: `${sTime ? sTime.toLocaleTimeString() : "Invalid input"} - ${eTime ? eTime.toLocaleTimeString() : "Invalid input"}`,
                     userName: meetingData.user?.name || "User"
                 }
                 : {
@@ -197,7 +204,8 @@ export function useMeetingDetail() {
                     date: "loading...",
                     time: "loading...",
                     userName: "loading...",
-                },
+                };
+        },
         [meetingData]
     )
 

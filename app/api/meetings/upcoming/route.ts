@@ -45,6 +45,12 @@ export async function GET() {
       take: 10,
     });
 
+    function safeToISO(value: any) {
+      if (!value) return null;
+      const d = new Date(value);
+      return !isNaN(d.getTime()) ? d.toISOString() : null;
+    }
+
     const events = upcomingMeetings.map((meeting) => {
       let parsedAttendees: any[] = [];
       try {
@@ -67,8 +73,8 @@ export async function GET() {
       return {
         id: meeting.calendarEventId || meeting.id,
         title: meeting.title,
-        startTime: meeting.startTime.toISOString(),
-        endTime: meeting.endTime.toISOString(),
+        startTime: safeToISO(meeting.startTime),
+        endTime: safeToISO(meeting.endTime),
         meetingUrl: meeting.meetingUrl,
         attendees: parsedAttendees,
         attendeesCount: parsedAttendees.length,

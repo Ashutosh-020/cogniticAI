@@ -13,6 +13,11 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 
+const safeDate = (value: any) => {
+    const d = value ? new Date(value) : null;
+    return d && !isNaN(d.getTime()) ? d : null;
+};
+
 const UpcomingEventCard = memo(function UpcomingEventCard({
     event,
     botOn,
@@ -45,7 +50,12 @@ const UpcomingEventCard = memo(function UpcomingEventCard({
                 <div className="flex items-center gap-2">
                     <Clock className="size-3.5 text-foreground/50" />
                     <span>
-                        {format(new Date(event.start?.dateTime || event.start?.date || ''), 'MMM d, h:mm a')}
+                        {(() => {
+                            const eventAny = event as any;
+                            const date = safeDate(eventAny.startTime || event.start?.dateTime || event.start?.date);
+                            if (!date) return "Invalid date";
+                            return format(date, 'MMM d, h:mm a');
+                        })()}
                     </span>
                 </div>
                 {event.attendees && event.attendees.length > 0 && (
