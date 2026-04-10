@@ -37,7 +37,7 @@ export async function sendMeetingSummaryEmail(data: EmailData) {
         )
 
         const result = await transporter.sendMail({
-            from: `"Meeting Bot" <${process.env.GMAIL_USER}>`,
+            from: `"Cognitic" <${process.env.GMAIL_USER}>`,
             to: data.userEmail,
             subject: `Meeting Summary Ready - ${data.meetingTitle}`,
             html: emailHtml
