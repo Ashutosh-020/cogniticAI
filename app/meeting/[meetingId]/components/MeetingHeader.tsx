@@ -113,7 +113,7 @@ function MeetingHeader({
             const result = await response.json()
 
             if (response.ok) {
-                router.push('/home')
+                router.push('/dashboard')
             } else {
 
             }
