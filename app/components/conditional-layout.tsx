@@ -9,7 +9,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const { isSignedIn } = useAuth()
 
-    const showSidebar = pathname !== "/" && !(pathname.startsWith("/meeting/") && !isSignedIn)
+    const showSidebar = pathname !== "/" && pathname !== "/privacy" && pathname !== "/terms" && !(pathname.startsWith("/meeting/") && !isSignedIn)
 
     if (!showSidebar) {
         return <div className="min-h-screen">{children}</div>
