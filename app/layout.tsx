@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cognitic",
   description: "An AI-powered meeting assistant that helps you stay organized and productive.",
+  verification: {
+    google: 'MgEfUTJjUY1hLQUN5q7snzBTGEwdHAIZeChFEDGDquA',
+  },
 };
 
 export default function RootLayout({
