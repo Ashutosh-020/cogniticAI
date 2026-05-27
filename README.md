@@ -1,89 +1,157 @@
-# Cognitic
+# Cognitic - AI Powered Meeting Intelligence Platform
 
-Cognitic is a centralized AI-powered meeting assistant platform designed to automate note-taking, summarize discussions, extract action items, and make all your meeting history semantically searchable. By joining your online meetings (Zoom, Google Meet, Teams), Cognitic processes real-time audio transcripts utilizing Google Gemini's advanced LLMs and Pinecone vector databases. It keeps your team in sync by deeply integrating with your favorite tools like Slack, Notion, and Google Calendar.
+Cognitic is described as an AI meeting intelligence and workflow automation platform that turns conversations from meetings into structured, actionable insights. It sits between video-conferencing tools and business apps, using AI to summarize discussions, extract decisions and action items, and then push these into systems like CRMs, project management tools.
 
-Built for high performance and scalability on a modern tech stack encompassing Next.js 16, React 19, and Neon Serverless PostgreSQL.
+Teams use Cognitic to reduce time spent on note-taking, ensure that decisions and tasks from meetings are reliably captured, and to create a searchable “memory” of discussions. Over time, this helps organizations cut post-meeting admin work, increase accountability on action items, and surface cross-meeting patterns such as recurring customer objections, frequently discussed features, or systemic blockers in internal workflows.
 
----
-
-## Features
-
-**🤖 Automated Meeting Assistant**  
-Automatic AI bot deployment to Zoom, Google Meet, and Microsoft Teams to record and transcribe.
-
-**📝 Transcription & Analysis**  
-Meeting transcription with speaker identification and diarization.  
-AI-generated meeting summaries and action items using Google Gemini AI.  
-
-**🧠 Advanced Search & Chat**  
-Chat with meeting conversational AI via a RAG pipeline powered by a Pinecone vector database.  
-Semantic search across all meeting transcripts and summaries.  
-Global chat feature to query across all meetings simultaneously.  
-Individual meeting chat interface for meeting-specific conversations.  
-
-**📅 Productivity Integrations**  
-Real-time calendar sync with Google Calendar.  
-One-click action item sync to project management tools like Notion and Trello.  
-Native Slack bot integration with `@meetingbot` commands using the Slack Bolt framework.  
-
-**⚙️ Platform & UX**  
-Comprehensive meeting dashboard with audio playback using React H5 Audio Player.  
-Complete meeting history with clickable past meeting navigation.  
-Upcoming meetings dashboard with toggle controls for bot attendance.  
-Modern, highly-responsive UI built with Next.js 16, Tailwind CSS 4, shadcn/ui, and Framer Motion.  
-Dark theme support using Next Themes.  
-Real-time notifications using Sonner toast system.  
-
-**🌍 Enterprise Management**  
-Three-tier subscription system with Stripe payment processing and webhook handling.  
-Secure user authentication and session management with Clerk.  
-AWS Lambda functions for automated bot scheduling.  
-Enterprise-grade security with proper webhook validation using Svix.  
-AWS S3 storage for audio files, transcript chunks, and user profile images.  
-Automated post-meeting email notifications using Resend integration.  
-Efficient, strongly-typed Postgres database management leveraging NeonDB and Prisma ORM.
+Designed with scalability, performance, and enterprise-grade architecture in mind, Cognitic delivers a seamless experience for individuals, startups, and collaborative teams.
 
 ---
 
-## Technologies and Frameworks
+## Core Features
 
-- **Next.js 16** & **React 19**
-- **TypeScript**
-- **Tailwind CSS 4**
-- **shadcn/ui** & **Framer Motion**
-- **Clerk Auth**
-- **Prisma ORM** & **Neon (Serverless PostgreSQL)**
-- **AWS SDK** (S3 Storage)
-- **AWS Lambda** & **EventBridge** (Bot Scheduling)
-- **Google Gemini AI API** (LLM Summarization & Entity Extraction)
-- **Pinecone Vector Database** (RAG / AI Chat)
-- **Stripe** (Billing & Subscriptions)
-- **Slack Bolt Framework**
-- **Resend** & **Nodemailer**
-- **Svix** (Webhook validation)
-- **React H5 Audio Player**
-- **Sonner** (Toasts)
-- **Next Themes**
+### 🤖 AI Meeting Automation
+- [ ] Automatic AI bot deployment to Zoom, Google Meet, and Microsoft Teams
+- [ ] Real-time meeting recording and transcription
+- [ ] Speaker diarization and participant identification
+- [ ] Automated post-meeting processing pipelines
+
+### 📝 AI Transcription & Summaries
+- [ ] AI-generated meeting summaries using Google Gemini API
+- [ ] Automatic action item extraction
+- [ ] Smart meeting insights and contextual analysis
+- [ ] Searchable meeting memory and history
+
+### 💬 Conversational AI & Semantic Search
+- [ ] RAG-powered conversational AI chat system
+- [ ] Pinecone vector database integration for semantic retrieval
+- [ ] Chat with individual meetings
+- [ ] Global AI search across all meetings simultaneously
+- [ ] Intelligent contextual querying over transcript history
+
+### 📅 Productivity & Workflow Integrations
+- [ ] Google Calendar real-time synchronization
+- [ ] One-click action item sync to Jira, Asana, and Trello
+- [ ] Native Slack bot integration using Slack Bolt Framework
+- [ ] Automated meeting notifications and follow-ups
+
+### 📊 Dashboard & User Experience
+- [ ] Comprehensive meeting dashboard with analytics
+- [ ] Audio playback support using React H5 Audio Player
+- [ ] Complete meeting history navigation
+- [ ] Upcoming meetings management dashboard
+- [ ] Toggle controls for AI bot attendance
+- [ ] Modern responsive UI optimized for all devices
+- [ ] Dark mode support with seamless theming
+
+### 🔐 Enterprise & Infrastructure
+- [ ] Secure authentication and session management using Clerk
+- [ ] AWS Lambda powered automation workflows
+- [ ] AWS EventBridge Scheduler for bot orchestration
+- [ ] AWS S3 storage for meeting audio and assets
+- [ ] Secure webhook validation using Svix
+- [ ] Stripe subscription and billing management
+- [ ] Automated email notifications with Resend
+- [ ] Scalable PostgreSQL database architecture using Prisma ORM
 
 ---
 
-## Upcoming Features
+# Tech Stack
 
-### Integrations 🔗
-- Notion Integration (Enhanced Syncing)
+## Frontend
+- [ ] Next.js
+- [ ] TypeScript
+- [ ] Tailwind CSS
+- [ ] Shadcn UI
+- [ ] React Context API
+- [ ] React H5 Audio Player
+
+## Backend & Database
+- [ ] Prisma ORM
+- [ ] PostgreSQL
+
+## AI & Search
+- [ ] Google Gemini API
+- [ ] Pinecone Vector Database
+- [ ] RAG Pipeline Architecture
+
+## Cloud & Infrastructure
+- [ ] AWS SDK
+- [ ] AWS Lambda
+- [ ] AWS S3
+- [ ] AWS EventBridge Scheduler
+
+## Authentication & Security
+- [ ] Clerk Authentication
+- [ ] Svix Webhook Validation
+
+## Integrations & Services
+- [ ] Stripe
+- [ ] Slack Bolt Framework
+- [ ] Resend
+
+---
+
+# Vision
+
+Cognitic is designed to become more than just a meeting recorder.
+
+The platform aims to serve as a centralized AI workspace where meetings evolve into searchable organizational memory, automated workflows, and actionable business intelligence - helping teams reduce manual effort, improve collaboration, and make smarter decisions faster.
+- [ ] **Target Users:** Sales teams, customer success teams, product managers, operations teams, startups, and collaborative organizations
+---
+
+# Upcoming Features
+
+## Advanced Integrations
+- Notion Integration
 - Linear Integration
 - Salesforce Integration
 - Hubspot Integration
 
-### Past Meetings Upgrades 🕰️
-- Advanced user meeting search operations
-- Date-based filtering (ex: March 17 to April 1)
-- Custom date ranges filtering (ex: last week, last month, last quarter)
-- Meeting duration filtering (ex: less than 30 mins)
+## Advanced Meeting Search
+- Date-based filtering
 - Participant-based filtering
-- **100+ Languages Transcript Translation:** Similar to what fireflies.ai does, users will be able to view their transcripts in over 100 languages. They can go to a dropdown menu and change their transcript language seamlessly using the Google Cloud Translation API.
+- Meeting duration filtering
+- Custom date range querying
+- Advanced semantic search operations
 
-### Workspaces Creation 🏢
-- Users can create customized, isolated workspaces
-- Users can invite team members and other people to their workspace
-- Role-based access control (Admin, Member, Viewer, etc.)
+## Multilingual AI
+- 100+ language transcript translation
+- Multi-language AI summaries
+- Global collaboration support
+
+## Workspaces & Collaboration
+- Team workspaces
+- Role-based access control
+- Workspace-level permissions
+- Team collaboration features
+
+---
+
+# Why Cognitic?
+
+Cognitic combines:
+- [ ] AI meeting intelligence
+- [ ] semantic organizational memory
+- [ ] workflow automation
+- [ ] conversational AI
+- [ ] productivity integrations
+
+into one scalable platform designed for modern collaborative teams.
+
+---
+
+# 📦 Installation
+
+```bash
+git clone <your-repository-url>
+cd cognitic
+npm install
+npm run dev
+```
+
+---
+
+# Built With Passion Using Modern AI & Cloud Technologies
+
+Cognitic is an independently developed full-stack AI SaaS platform focused on building intelligent productivity systems powered by modern LLM workflows and scalable cloud infrastructure.
